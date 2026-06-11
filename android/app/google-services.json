@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "424309025339",
+    "project_id": "money-factory-1c1ef",
+    "storage_bucket": "money-factory-1c1ef.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:424309025339:android:d259cd131f0b19ea6f8a1e",
+        "android_client_info": {
+          "package_name": "com.moneyfactory.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "424309025339-ns8hg98k8qriap67il4gf43r42stk4db.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.moneyfactory.app",
+            "certificate_hash": "c9ad5455ed2fc38d5115b5b5c6a9299e3272eff5"
+          }
+        },
+        {
+          "client_id": "424309025339-oque1edpdth13r53s08oiltbsfrdaaqv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2E7ZrVnDEpfyx77RJ6KVgZZiZcgCq0f0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "424309025339-oque1edpdth13r53s08oiltbsfrdaaqv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "424309025339-m6m0ma83519o6alqnbj3rhoenf6v55q6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.moneyfactory.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

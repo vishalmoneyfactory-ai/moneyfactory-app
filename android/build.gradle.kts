@@ -1,3 +1,5 @@
+import com.android.build.gradle.LibraryExtension
+
 allprojects {
     repositories {
         google()
@@ -17,6 +19,19 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
+}
+
+subprojects {
+    plugins.withId("com.android.library") {
+        extensions.configure<LibraryExtension>("android") {
+            if (namespace == null) {
+                namespace = "com.moneyfactory.${project.name.replace("-", "_")}"
+            }
+        }
+    }
+    configurations.all {
+        resolutionStrategy.force("com.razorpay:checkout:1.6.41")
+    }
 }
 
 tasks.register<Delete>("clean") {
