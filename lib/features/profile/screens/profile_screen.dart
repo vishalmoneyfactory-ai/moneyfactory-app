@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/api/api_service.dart';
 import '../../../core/api/dio_client.dart';
@@ -60,6 +61,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not open: $url'), backgroundColor: AppColors.error),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,19 +82,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: FutureBuilder<List<dynamic>>(
           future: _future,
           builder: (context, snapshot) {
-            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: AppColors.gold));
+            // Error state — scrollable so pull-to-refresh still works
+            if (snapshot.hasError) {
+              return SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.wifi_off, color: AppColors.muted, size: 52),
+                        const SizedBox(height: 16),
+                        const Text('Could not load profile', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                        const SizedBox(height: 6),
+                        Text(
+                          snapshot.error.toString().replaceAll('Exception: ', ''),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: AppColors.muted, fontSize: 13),
+                        ),
+                        const SizedBox(height: 20),
+                        const Text('Pull down to retry', style: TextStyle(color: AppColors.gold, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+            // Loading state — scrollable so pull-to-refresh still works
+            if (!snapshot.hasData) {
+              return const SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: 400,
+                  child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
+                ),
+              );
+            }
             final user = snapshot.data![0] as Map<String, dynamic>;
             final progress = snapshot.data![1] as List<dynamic>;
             final legal = snapshot.data![2] as List<dynamic>;
             final settings = snapshot.data![3] as Map<String, dynamic>;
             final courses = user['purchasedCourses'] as List<dynamic>? ?? [];
             final hours = progress.fold<num>(0, (sum, p) => sum + ((p['watchedSeconds'] ?? 0) as num)) / 3600;
+
+            // Filter out refund policy from legal pages
+            final filteredLegal = legal.where((p) {
+              final title = (p['title'] ?? '').toString().toLowerCase();
+              return !title.contains('refund');
+            }).toList();
+
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
                 _hero(user),
                 const SizedBox(height: 16),
-                Row(children: [_stat('Courses Owned', '${courses.length}'), _stat('Videos Watched', '${progress.where((p) => p['isCompleted'] == true).length}'), _stat('Hours Learned', hours.toStringAsFixed(1))]),
+                Row(children: [
+                  _stat('Courses Owned', '${courses.length}'),
+                  _stat('Videos Watched', '${progress.where((p) => p['isCompleted'] == true).length}'),
+                  _stat('Hours Learned', hours.toStringAsFixed(1)),
+                ]),
                 const SizedBox(height: 16),
                 _sectionTitle('Owned Courses'),
                 if (courses.isEmpty)
@@ -91,12 +150,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ...courses.map((course) => _ownedCourse(context, course)),
                 const SizedBox(height: 16),
                 _tile(context, 'Edit Account', Icons.manage_accounts, () => _editAccount(user)),
-                _tile(context, 'Notification Settings', Icons.notifications, () => _showText(context, 'Notifications', 'Push notifications are enabled from your device settings.')),
-                _tile(context, 'Help & Support', Icons.support_agent, () => _showText(context, 'Support', 'Email: ${settings['company']?['supportEmail'] ?? 'support@moneyfactory.com'}\nPhone: ${settings['company']?['supportPhone'] ?? ''}')),
+                _tile(context, 'Help & Support', Icons.support_agent, () => _showHelpSupport(context)),
+                _tile(context, 'Join Telegram', Icons.send, () => _launchUrl('https://t.me/money_factory_indicator')),
                 _tile(context, 'About', Icons.info, () => _showText(context, 'About Money Factory', settings['company']?['description'] ?? 'Money Factory')),
-                ...legal.map((p) => _tile(context, p['title'], Icons.article_outlined, () => _showText(context, p['title'], p['content']))),
+                ...filteredLegal.map((p) => _tile(context, p['title'], Icons.article_outlined, () => _showText(context, p['title'], p['content']))),
                 const SizedBox(height: 12),
-                ListTile(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: const BorderSide(color: AppColors.border)), tileColor: AppColors.cardBg, leading: const Icon(Icons.logout, color: AppColors.error), title: const Text('Logout', style: TextStyle(color: AppColors.error)), onTap: () async { await _auth.signOut(); if (context.mounted) context.go('/login'); }),
+                ListTile(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: const BorderSide(color: AppColors.border)),
+                  tileColor: AppColors.cardBg,
+                  leading: const Icon(Icons.logout, color: AppColors.error),
+                  title: const Text('Logout', style: TextStyle(color: AppColors.error)),
+                  onTap: () async {
+                    await _auth.signOut();
+                    if (context.mounted) context.go('/login');
+                  },
+                ),
               ],
             );
           },
@@ -109,16 +177,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final image = api.mediaUrl(user['profileImage'] as String?);
     return Container(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.goldGlow)),
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.goldGlow),
+      ),
       child: Column(children: [
-        Stack(alignment: Alignment.bottomRight, children: [
-          CircleAvatar(radius: 46, backgroundColor: AppColors.secondaryBg, backgroundImage: image.isEmpty ? null : CachedNetworkImageProvider(image), child: image.isEmpty ? Text(_initials(user['name'] ?? user['email']), style: const TextStyle(color: AppColors.gold, fontSize: 24, fontWeight: FontWeight.w900)) : null),
-          Material(color: AppColors.gold, shape: const CircleBorder(), child: IconButton(onPressed: _busy ? null : _pickProfileImage, icon: const Icon(Icons.camera_alt, color: AppColors.primaryBg), tooltip: 'Update photo')),
-        ]),
+        // Avatar with camera button positioned outside/beside (bottom-right corner, not overlapping face)
+        SizedBox(
+          width: 108,
+          height: 108,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              CircleAvatar(
+                radius: 46,
+                backgroundColor: AppColors.secondaryBg,
+                backgroundImage: image.isEmpty ? null : CachedNetworkImageProvider(image),
+                child: image.isEmpty
+                    ? Text(_initials(user['name'] ?? user['email']),
+                        style: const TextStyle(color: AppColors.gold, fontSize: 24, fontWeight: FontWeight.w900))
+                    : null,
+              ),
+              Positioned(
+                bottom: 0,
+                right: -8,
+                child: Material(
+                  color: AppColors.gold,
+                  shape: const CircleBorder(),
+                  elevation: 3,
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: _busy ? null : _pickProfileImage,
+                    child: const Padding(
+                      padding: EdgeInsets.all(7),
+                      child: Icon(Icons.camera_alt, color: AppColors.primaryBg, size: 18),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
         const SizedBox(height: 12),
         Text(user['name'] ?? '', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
         Text(user['email'] ?? '', style: const TextStyle(color: AppColors.muted)),
-        if (image.isNotEmpty) TextButton.icon(onPressed: _busy ? null : _removeProfileImage, icon: const Icon(Icons.delete_outline), label: const Text('Remove Photo')),
+        if (user['phone'] != null && (user['phone'] as String).isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text(user['phone'], style: const TextStyle(color: AppColors.muted, fontSize: 13)),
+          ),
+        if (image.isNotEmpty)
+          TextButton.icon(
+            onPressed: _busy ? null : _removeProfileImage,
+            icon: const Icon(Icons.delete_outline),
+            label: const Text('Remove Photo'),
+          ),
       ]),
     );
   }
@@ -128,9 +242,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.border)),
     child: Row(children: [
-      Container(width: 62, height: 62, clipBehavior: Clip.antiAlias, decoration: BoxDecoration(color: AppColors.secondaryBg, borderRadius: BorderRadius.circular(8)), child: (course['thumbnail'] ?? '').toString().isEmpty ? const Icon(Icons.school, color: AppColors.gold) : CachedNetworkImage(imageUrl: api.mediaUrl(course['thumbnail']), fit: BoxFit.cover)),
+      Container(
+        width: 62, height: 62,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(color: AppColors.secondaryBg, borderRadius: BorderRadius.circular(8)),
+        child: (course['thumbnail'] ?? '').toString().isEmpty
+            ? const Icon(Icons.school, color: AppColors.gold)
+            : CachedNetworkImage(imageUrl: api.mediaUrl(course['thumbnail']), fit: BoxFit.cover),
+      ),
       const SizedBox(width: 12),
-      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(course['title'], maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800)), const SizedBox(height: 4), Text('${course['totalVideos'] ?? 0} videos', style: const TextStyle(color: AppColors.muted, fontSize: 12))])),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(course['title'], maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800)),
+        const SizedBox(height: 4),
+        Text('${course['totalVideos'] ?? 0} videos', style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+      ])),
       TextButton(onPressed: () => context.push('/course/${course['_id']}'), child: const Text('Open')),
     ]),
   );
@@ -139,34 +264,285 @@ class _ProfileScreenState extends State<ProfileScreen> {
     margin: const EdgeInsets.only(bottom: 10),
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.border)),
-    child: Row(children: [const Expanded(child: Text('No purchased courses yet', style: TextStyle(color: AppColors.muted))), TextButton(onPressed: () => context.go('/home'), child: const Text('Browse'))]),
+    child: Row(children: [
+      const Expanded(child: Text('No purchased courses yet', style: TextStyle(color: AppColors.muted))),
+      TextButton(onPressed: () => context.go('/home'), child: const Text('Browse')),
+    ]),
   );
 
   Future<void> _editAccount(Map<String, dynamic> user) async {
     final name = TextEditingController(text: user['name'] ?? '');
     final phone = TextEditingController(text: user['phone'] ?? '');
+    final bio = TextEditingController(text: user['bio'] ?? '');
+    final city = TextEditingController(text: user['city'] ?? '');
+    final country = TextEditingController(text: user['country'] ?? '');
+    final dob = TextEditingController(text: user['dateOfBirth'] ?? '');
+
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.cardBg,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => StatefulBuilder(
+        builder: (ctx, setModal) => Padding(
+          padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 24),
+          child: SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                const Icon(Icons.manage_accounts, color: AppColors.gold),
+                const SizedBox(width: 10),
+                const Text('Edit Account', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.gold)),
+              ]),
+              const SizedBox(height: 6),
+              const Text('Update your personal information below.', style: TextStyle(color: AppColors.muted, fontSize: 13)),
+              const SizedBox(height: 20),
+
+              // Name
+              TextField(
+                controller: name,
+                decoration: const InputDecoration(
+                  labelText: 'Full Name',
+                  prefixIcon: Icon(Icons.person_outline),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Phone
+              TextField(
+                controller: phone,
+                keyboardType: TextInputType.phone,
+                decoration: const InputDecoration(
+                  labelText: 'Phone Number',
+                  prefixIcon: Icon(Icons.phone_outlined),
+                  hintText: '+91 XXXXXXXXXX',
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Bio
+              TextField(
+                controller: bio,
+                maxLines: 3,
+                maxLength: 160,
+                decoration: const InputDecoration(
+                  labelText: 'Bio',
+                  prefixIcon: Icon(Icons.info_outline),
+                  hintText: 'Tell us a bit about yourself...',
+                  alignLabelWithHint: true,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // City
+              TextField(
+                controller: city,
+                decoration: const InputDecoration(
+                  labelText: 'City',
+                  prefixIcon: Icon(Icons.location_city_outlined),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Country
+              TextField(
+                controller: country,
+                decoration: const InputDecoration(
+                  labelText: 'Country',
+                  prefixIcon: Icon(Icons.flag_outlined),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Date of Birth
+              TextField(
+                controller: dob,
+                readOnly: true,
+                decoration: const InputDecoration(
+                  labelText: 'Date of Birth',
+                  prefixIcon: Icon(Icons.cake_outlined),
+                  hintText: 'YYYY-MM-DD',
+                ),
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.tryParse(dob.text) ?? DateTime(2000),
+                    firstDate: DateTime(1940),
+                    lastDate: DateTime.now(),
+                    builder: (context, child) => Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: const ColorScheme.dark(
+                          primary: AppColors.gold,
+                          onPrimary: AppColors.primaryBg,
+                          surface: AppColors.cardBg,
+                        ),
+                      ),
+                      child: child!,
+                    ),
+                  );
+                  if (picked != null) {
+                    dob.text = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+                  }
+                },
+              ),
+              const SizedBox(height: 20),
+
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  icon: const Icon(Icons.save_outlined),
+                  label: const Text('Save Changes'),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    await _run(
+                      () => api.updateMe({
+                        'name': name.text.trim(),
+                        'phone': phone.text.trim(),
+                        'bio': bio.text.trim(),
+                        'city': city.text.trim(),
+                        'country': country.text.trim(),
+                        'dateOfBirth': dob.text.trim(),
+                      }),
+                      success: 'Profile updated',
+                    );
+                  },
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showHelpSupport(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.cardBg,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => Padding(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20),
-        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Edit Account', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.gold)),
-          const SizedBox(height: 14),
-          TextField(controller: name, decoration: const InputDecoration(labelText: 'Name')),
-          const SizedBox(height: 12),
-          TextField(controller: phone, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Phone')),
-          const SizedBox(height: 16),
-          SizedBox(width: double.infinity, child: FilledButton(onPressed: () async { Navigator.pop(context); await _run(() => api.updateMe({'name': name.text.trim(), 'phone': phone.text.trim()}), success: 'Profile updated'); }, child: const Text('Save Changes'))),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Help & Support', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.gold)),
+            const SizedBox(height: 6),
+            const Text('Reach us through any of the channels below.', style: TextStyle(color: AppColors.muted, fontSize: 13)),
+            const SizedBox(height: 20),
+
+            // Email
+            _contactTile(
+              icon: Icons.email_outlined,
+              color: const Color(0xFF4CAF50),
+              label: 'Mail Us',
+              subtitle: 'vishalmoneyfactory@gmail.com',
+              onTap: () => _launchUrl('mailto:vishalmoneyfactory@gmail.com'),
+            ),
+            const SizedBox(height: 12),
+
+            // WhatsApp
+            _contactTile(
+              icon: Icons.chat_outlined,
+              color: const Color(0xFF25D366),
+              label: 'Contact via WhatsApp',
+              subtitle: '+91 8446519926',
+              onTap: () => _launchUrl('https://wa.me/918446519926'),
+            ),
+            const SizedBox(height: 12),
+
+            // Instagram
+            _contactTile(
+              icon: Icons.camera_alt_outlined,
+              color: const Color(0xFFE1306C),
+              label: 'Instagram',
+              subtitle: '@trader_vicky1',
+              onTap: () => _launchUrl('https://www.instagram.com/trader_vicky1?igsh=MWVlamdmbmRtcXZmaQ=='),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _contactTile({
+    required IconData icon,
+    required Color color,
+    required String label,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Row(children: [
+          Container(
+            width: 44, height: 44,
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.15), shape: BoxShape.circle),
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(label, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+            const SizedBox(height: 2),
+            Text(subtitle, style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w600)),
+          ])),
+          Icon(Icons.open_in_new, color: color.withValues(alpha: 0.7), size: 18),
         ]),
       ),
     );
   }
 
-  Widget _sectionTitle(String title) => Padding(padding: const EdgeInsets.only(bottom: 10), child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)));
-  Widget _stat(String label, String value) => Expanded(child: Container(margin: const EdgeInsets.symmetric(horizontal: 4), padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.border)), child: Column(children: [Text(value, style: const TextStyle(color: AppColors.gold, fontFamily: 'JetBrains Mono', fontWeight: FontWeight.w900, fontSize: 19)), const SizedBox(height: 4), Text(label, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.muted, fontSize: 12))])));
-  Widget _tile(BuildContext context, String title, IconData icon, VoidCallback onTap) => Padding(padding: const EdgeInsets.only(bottom: 8), child: ListTile(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: const BorderSide(color: AppColors.border)), tileColor: AppColors.cardBg, leading: Icon(icon, color: AppColors.gold), title: Text(title), trailing: const Icon(Icons.chevron_right), onTap: onTap));
+  Widget _sectionTitle(String title) => Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+  );
+
+  Widget _stat(String label, String value) => Expanded(
+    child: Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.border)),
+      child: Column(children: [
+        Text(value, style: const TextStyle(color: AppColors.gold, fontFamily: 'JetBrains Mono', fontWeight: FontWeight.w900, fontSize: 19)),
+        const SizedBox(height: 4),
+        Text(label, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+      ]),
+    ),
+  );
+
+  Widget _tile(BuildContext context, String title, IconData icon, VoidCallback onTap) => Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: ListTile(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: const BorderSide(color: AppColors.border)),
+      tileColor: AppColors.cardBg,
+      leading: Icon(icon, color: AppColors.gold),
+      title: Text(title),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: onTap,
+    ),
+  );
+
   String _initials(String text) => text.trim().split(RegExp(r'\s+')).take(2).map((p) => p.isEmpty ? '' : p[0].toUpperCase()).join();
-  void _showText(BuildContext context, String title, String body) => showModalBottomSheet(context: context, backgroundColor: AppColors.cardBg, builder: (_) => Padding(padding: const EdgeInsets.all(20), child: SingleChildScrollView(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.gold)), const SizedBox(height: 12), Text(body, style: const TextStyle(height: 1.5))]))));
+
+  void _showText(BuildContext context, String title, String body) => showModalBottomSheet(
+    context: context,
+    backgroundColor: AppColors.cardBg,
+    builder: (_) => Padding(
+      padding: const EdgeInsets.all(20),
+      child: SingleChildScrollView(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.gold)),
+          const SizedBox(height: 12),
+          Text(body, style: const TextStyle(height: 1.5)),
+        ]),
+      ),
+    ),
+  );
 }

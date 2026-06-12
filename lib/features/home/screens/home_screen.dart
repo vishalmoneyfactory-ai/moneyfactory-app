@@ -14,7 +14,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late Future<List<dynamic>> _future;
   final Set<String> _favorites = {};
   bool _unlocking = false;
@@ -22,7 +23,21 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _future = _load();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setState(() => _future = _load());
+    }
   }
 
   Future<List<dynamic>> _load() =>
@@ -72,9 +87,41 @@ class _HomeScreenState extends State<HomeScreen> {
         child: FutureBuilder<List<dynamic>>(
           future: _future,
           builder: (context, snapshot) {
+            // Error state — scrollable so pull-to-refresh still works
+            if (snapshot.hasError) {
+              return SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.wifi_off, color: AppColors.muted, size: 52),
+                        const SizedBox(height: 16),
+                        const Text('Could not load data', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                        const SizedBox(height: 6),
+                        Text(
+                          snapshot.error.toString().replaceAll('Exception: ', ''),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: AppColors.muted, fontSize: 13),
+                        ),
+                        const SizedBox(height: 20),
+                        const Text('Pull down to retry', style: TextStyle(color: AppColors.gold, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+            // Loading state — scrollable so pull-to-refresh still works
             if (!snapshot.hasData) {
-              return const Center(
-                child: CircularProgressIndicator(color: AppColors.gold),
+              return const SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: 400,
+                  child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
+                ),
               );
             }
             final courses = (snapshot.data![0] as List<dynamic>)
