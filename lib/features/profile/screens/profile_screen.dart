@@ -126,10 +126,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             final courses = user['purchasedCourses'] as List<dynamic>? ?? [];
             final hours = progress.fold<num>(0, (sum, p) => sum + ((p['watchedSeconds'] ?? 0) as num)) / 3600;
 
-            // Filter out refund policy from legal pages
+            // Filter out refund policy and contact us from legal pages
             final filteredLegal = legal.where((p) {
               final title = (p['title'] ?? '').toString().toLowerCase();
-              return !title.contains('refund');
+              return !title.contains('refund') && !title.contains('contact');
             }).toList();
 
             return ListView(
@@ -450,7 +450,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Instagram
             _contactTile(
               icon: Icons.camera_alt_outlined,
               color: const Color(0xFFE1306C),
