@@ -28,15 +28,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      backgroundColor: Colors.black,
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(radius: 42, backgroundColor: AppColors.gold, child: Text('MF', style: TextStyle(color: AppColors.primaryBg, fontWeight: FontWeight.w900, fontSize: 30))),
-            SizedBox(height: 20),
-            Text('MONEY FACTORY', style: TextStyle(color: AppColors.gold, fontSize: 28, fontWeight: FontWeight.w900)),
-          ],
+        child: Image.asset(
+          'assets/images/image.png',
+          width: 260,
+          fit: BoxFit.contain,
         ),
       ),
     );

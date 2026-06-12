@@ -174,49 +174,26 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   PreferredSizeWidget _appBar(BuildContext context) {
     return AppBar(
-      toolbarHeight: 74,
+      toolbarHeight: 68,
       titleSpacing: 16,
       title: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
+          Image.asset(
+            'assets/images/image.png',
             width: 42,
             height: 42,
-            decoration: BoxDecoration(
-              color: AppColors.gold,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(
-              Icons.candlestick_chart,
-              color: AppColors.primaryBg,
-            ),
+            fit: BoxFit.contain,
           ),
           const SizedBox(width: 12),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'MONEY FACTORY',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0,
-                    fontSize: 18,
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Trading command center',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: AppColors.muted,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+          const Text(
+            'MONEY FACTORY',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0,
+              fontSize: 18,
             ),
           ),
         ],
