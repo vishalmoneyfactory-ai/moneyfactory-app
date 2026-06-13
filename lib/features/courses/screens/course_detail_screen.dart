@@ -27,6 +27,7 @@ class CourseDetailScreen extends StatelessWidget {
           final course = snapshot.data!['course'] as Map<String, dynamic>;
           final videos = (course['videos'] as List<dynamic>? ?? []);
           final owned = course['isOwned'] == true;
+          final expired = course['access']?['isExpired'] == true;
           final isFree = course['isFree'] == true;
           final thumbnail = api.mediaUrl(course['thumbnail'] as String?);
           return Stack(
@@ -73,6 +74,13 @@ class CourseDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   _priceRow(course),
+                  if (course['access'] != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      _accessLabel(course['access']),
+                      style: TextStyle(color: expired ? AppColors.error : AppColors.muted, fontWeight: expired ? FontWeight.w800 : FontWeight.w500),
+                    ),
+                  ],
                   const SizedBox(height: 12),
                   Text(
                     course['shortDescription'] ?? '',
@@ -151,6 +159,8 @@ class CourseDetailScreen extends StatelessWidget {
                         child: GoldButton(
                           label: owned
                               ? 'Start Learning'
+                              : expired
+                              ? 'Repurchase Required'
                               : isFree
                               ? 'Unlock Free'
                               : 'Buy Now',
@@ -282,5 +292,15 @@ class CourseDetailScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _accessLabel(Map<String, dynamic> access) {
+    if (access['isExpired'] == true) return 'Course Expired - Repurchase Required.';
+    final days = access['daysRemaining'];
+    if (days is num) return '$days Days Remaining';
+    final expiry = access['expiryDate'];
+    if (expiry != null) return 'Expiry Date: ${expiry.toString().split('T').first}';
+    if (access['isOwned'] == true) return 'Lifetime Access';
+    return '';
   }
 }

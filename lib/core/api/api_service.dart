@@ -28,7 +28,7 @@ class ApiService {
   Future<Map<String, dynamic>> removeProfileImage() async => (await _client.dio.delete('/auth/me/profile-image')).data['user'] as Map<String, dynamic>;
   Future<Map<String, dynamic>> validateCoupon(Map<String, dynamic> body) async => (await _client.dio.post('/coupons/validate', data: body)).data as Map<String, dynamic>;
   Future<Map<String, dynamic>> createOrder(Map<String, dynamic> body) async => (await _client.dio.post('/payments/create-order', data: body)).data as Map<String, dynamic>;
-  Future<void> verifyPayment(Map<String, dynamic> body) async => _client.dio.post('/payments/verify', data: body);
+  Future<Map<String, dynamic>> verifyPayment(Map<String, dynamic> body) async => (await _client.dio.post('/payments/verify', data: body)).data as Map<String, dynamic>;
   Future<void> updateProgress(Map<String, dynamic> body) async => _client.dio.post('/progress/update', data: body);
   Future<void> review(String courseId, int rating, String comment) async => _client.dio.put('/reviews/course/$courseId', data: {'rating': rating, 'comment': comment});
   String razorpayKey() => dotenv.env['RAZORPAY_KEY_ID'] ?? '';

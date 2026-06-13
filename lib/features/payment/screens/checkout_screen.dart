@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:go_router/go_router.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
@@ -24,6 +25,7 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   late final Razorpay _razorpay;
   final _coupon = TextEditingController();
+  final _referral = TextEditingController();
   Map<String, dynamic>? _course;
   Map<String, dynamic>? _order;
   num _discount = 0;
@@ -41,6 +43,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   void dispose() {
     _razorpay.clear();
+    _coupon.dispose();
+    _referral.dispose();
     super.dispose();
   }
 
@@ -72,6 +76,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'courseId': widget.courseId,
         'isBundle': widget.isBundle,
         'couponCode': _coupon.text.trim().isEmpty ? null : _coupon.text.trim(),
+        'referralCode': _referral.text.trim().isEmpty ? null : _referral.text.trim(),
       });
       _order = order;
       _razorpay.open({
@@ -87,6 +92,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'theme': {'color': '#FFD700'},
       });
     } catch (e) {
+      if (e is DioException && e.response?.data is Map && e.response?.data['code'] == 'PHONE_REQUIRED') {
+        _snack('Please add your phone number before purchasing a course.', AppColors.error);
+        if (mounted) context.push('/complete-profile');
+        return;
+      }
       _snack(e.toString(), AppColors.error);
     } finally {
       setState(() => _loading = false);
@@ -94,13 +104,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Future<void> _success(PaymentSuccessResponse response) async {
-    await api.verifyPayment({
+    final result = await api.verifyPayment({
       'razorpayOrderId': response.orderId ?? _order?['orderId'],
       'razorpayPaymentId': response.paymentId,
       'razorpaySignature': response.signature,
     });
     if (!mounted) return;
-    _snack('Payment successful', AppColors.success);
+    final reward = result['referralReward'];
+    if (reward != null) {
+      _snack('\u20b9${reward['rewardAmount']} has been credited to your Money Factory Wallet. The amount will be transferred to your bank account shortly.', AppColors.success);
+    } else {
+      _snack('Payment successful', AppColors.success);
+    }
     context.go('/learning');
   }
 
@@ -159,6 +174,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: _referral,
+                  textCapitalization: TextCapitalization.characters,
+                  decoration: const InputDecoration(
+                    labelText: 'Referral Code (optional)',
+                  ),
                 ),
                 const SizedBox(height: 14),
                 _box([

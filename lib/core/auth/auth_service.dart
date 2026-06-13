@@ -25,10 +25,10 @@ class AuthService {
     return _exchangeFirebaseToken(credential.user);
   }
 
-  Future<Map<String, dynamic>> register(String name, String email, String password) async {
+  Future<Map<String, dynamic>> register(String name, String phone, String email, String password) async {
     final credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
     await credential.user?.updateDisplayName(name);
-    return _exchangeFirebaseToken(credential.user, name: name);
+    return _exchangeFirebaseToken(credential.user, name: name, phone: phone);
   }
 
   Future<Map<String, dynamic>> signInWithGoogle() async {
@@ -40,10 +40,14 @@ class AuthService {
     return _exchangeFirebaseToken(userCredential.user);
   }
 
-  Future<Map<String, dynamic>> _exchangeFirebaseToken(User? firebaseUser, {String? name}) async {
+  Future<Map<String, dynamic>> _exchangeFirebaseToken(User? firebaseUser, {String? name, String? phone}) async {
     if (firebaseUser == null) throw Exception('Firebase user missing');
     final idToken = await firebaseUser.getIdToken();
-    final res = await _client.dio.post('/auth/verify-firebase', data: {'idToken': idToken, 'name': name ?? firebaseUser.displayName});
+    final res = await _client.dio.post('/auth/verify-firebase', data: {
+      'idToken': idToken,
+      'name': name ?? firebaseUser.displayName,
+      if (phone != null) 'phone': phone,
+    });
     await _storage.write(key: 'jwt', value: res.data['token']);
     await _syncFcm();
     return res.data['user'] as Map<String, dynamic>;

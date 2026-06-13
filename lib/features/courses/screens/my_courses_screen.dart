@@ -106,6 +106,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                 final completed = rows.where((p) => p['isCompleted'] == true).length;
                 final total = c['totalVideos'] == 0 ? rows.length : c['totalVideos'];
                 final percent = total == 0 ? 0.0 : completed / total;
+                final expired = c['isExpired'] == true;
                 return Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
@@ -132,10 +133,12 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                       ),
                       const SizedBox(height: 6),
                       Text('$completed of $total videos', style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+                      const SizedBox(height: 4),
+                      Text(_validityLabel(c), style: TextStyle(color: expired ? AppColors.error : AppColors.muted, fontSize: 12, fontWeight: expired ? FontWeight.w800 : FontWeight.w500)),
                     ])),
                     TextButton(
                       onPressed: () => context.push('/course/${c['_id']}'),
-                      child: const Text('Continue'),
+                      child: Text(expired ? 'Repurchase' : 'Continue'),
                     ),
                   ]),
                 );
@@ -145,5 +148,14 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
         ),
       ),
     );
+  }
+
+  String _validityLabel(dynamic course) {
+    if (course['isExpired'] == true) return 'Course Expired';
+    final days = course['daysRemaining'];
+    if (days is num) return '$days Days Remaining';
+    final expiry = course['expiryDate'];
+    if (expiry != null) return 'Expiry Date: ${expiry.toString().split('T').first}';
+    return 'Lifetime Access';
   }
 }

@@ -17,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   late final TabController _tabs;
   final _auth = AuthService(dioProvider);
   final _name = TextEditingController();
+  final _phone = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _confirm = TextEditingController();
@@ -60,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               ),
               const SizedBox(height: 20),
               SizedBox(
-                height: 410,
+                height: 470,
                 child: TabBarView(
                   controller: _tabs,
                   children: [
@@ -76,6 +77,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     _form(children: [
                       TextField(controller: _name, decoration: const InputDecoration(labelText: 'Name')),
                       const SizedBox(height: 12),
+                      TextField(controller: _phone, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Phone Number')),
+                      const SizedBox(height: 12),
                       TextField(controller: _email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Email')),
                       const SizedBox(height: 12),
                       TextField(controller: _password, obscureText: true, decoration: const InputDecoration(labelText: 'Password')),
@@ -84,7 +87,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       const SizedBox(height: 18),
                       GoldButton(label: _loading ? 'Creating...' : 'Create Account', onPressed: _loading ? null : () => _run(() async {
                         if (_password.text != _confirm.text) throw Exception('Passwords do not match');
-                        await _auth.register(_name.text.trim(), _email.text.trim(), _password.text);
+                        if (_phone.text.trim().isEmpty) throw Exception('Phone number is required');
+                        await _auth.register(_name.text.trim(), _phone.text.trim(), _email.text.trim(), _password.text);
                       })),
                     ]),
                   ],

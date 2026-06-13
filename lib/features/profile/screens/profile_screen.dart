@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -69,6 +70,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
           SnackBar(content: Text('Could not open: $url'), backgroundColor: AppColors.error),
         );
       }
+    }
+  }
+
+  Future<void> _shareReferral(Map<String, dynamic> user, Map<String, dynamic> settings) async {
+    final downloads = settings['appDownloads'] as Map<String, dynamic>? ?? {};
+    final downloadLink = (downloads['android'] ?? downloads['ios'] ?? downloads['website'] ?? '').toString();
+    final fallbackLink = (downloads['website'] ?? downloads['android'] ?? downloads['ios'] ?? '').toString();
+    final link = downloadLink.isNotEmpty ? downloadLink : fallbackLink;
+    final message = '''
+Join Money Factory and learn professional trading.
+
+Use my referral code:
+
+${user['referralCode'] ?? ''}
+
+Download the app:
+
+$link
+''';
+    final url = kIsWeb
+        ? 'https://wa.me/?text=${Uri.encodeComponent(message)}'
+        : 'whatsapp://send?text=${Uri.encodeComponent(message)}';
+    if (!await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication)) {
+      await _launchUrl('https://wa.me/?text=${Uri.encodeComponent(message)}');
     }
   }
 
@@ -142,6 +167,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _stat('Videos Watched', '${progress.where((p) => p['isCompleted'] == true).length}'),
                   _stat('Hours Learned', hours.toStringAsFixed(1)),
                 ]),
+                const SizedBox(height: 16),
+                _referralCard(user, settings),
                 const SizedBox(height: 16),
                 _sectionTitle('Owned Courses'),
                 if (courses.isEmpty)
@@ -255,10 +282,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Text(course['title'], maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800)),
         const SizedBox(height: 4),
         Text('${course['totalVideos'] ?? 0} videos', style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+        const SizedBox(height: 4),
+        Text(_validityLabel(course), style: TextStyle(color: course['isExpired'] == true ? AppColors.error : AppColors.muted, fontSize: 12)),
       ])),
       TextButton(onPressed: () => context.push('/course/${course['_id']}'), child: const Text('Open')),
     ]),
   );
+
+  Widget _referralCard(Map<String, dynamic> user, Map<String, dynamic> settings) {
+    final history = user['referralHistory'] as List<dynamic>? ?? [];
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.border)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('Money Factory Wallet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.gold)),
+        const SizedBox(height: 12),
+        Row(children: [
+          _miniStat('Referral Code', (user['referralCode'] ?? '-').toString()),
+          _miniStat('Wallet Balance', '\u20b9${user['walletBalance'] ?? 0}'),
+          _miniStat('Total Referrals', '${user['totalReferrals'] ?? 0}'),
+        ]),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            icon: const Icon(Icons.share),
+            label: const Text('Share Referral Code'),
+            onPressed: () => _shareReferral(user, settings),
+          ),
+        ),
+        if (history.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          const Text('Referral History', style: TextStyle(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 8),
+          ...history.take(5).map((row) => Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Text(
+              '${row['referredUserId']?['name'] ?? row['referredUserId']?['email'] ?? 'Referral'} - ${row['status']} - \u20b9${row['rewardAmount']}',
+              style: const TextStyle(color: AppColors.muted, fontSize: 12),
+            ),
+          )),
+        ],
+      ]),
+    );
+  }
+
+  Widget _miniStat(String label, String value) => Expanded(
+    child: Container(
+      margin: const EdgeInsets.symmetric(horizontal: 3),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(color: AppColors.secondaryBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.border)),
+      child: Column(children: [
+        Text(value, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: AppColors.gold, fontFamily: 'JetBrains Mono', fontWeight: FontWeight.w900, fontSize: 13)),
+        const SizedBox(height: 4),
+        Text(label, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.muted, fontSize: 11)),
+      ]),
+    ),
+  );
+
+  String _validityLabel(dynamic course) {
+    if (course['isExpired'] == true) return 'Course Expired';
+    final days = course['daysRemaining'];
+    if (days is num) return '$days Days Remaining';
+    final expiry = course['expiryDate'];
+    if (expiry != null) return 'Expiry Date: ${expiry.toString().split('T').first}';
+    return 'Lifetime Access';
+  }
 
   Widget _emptyCourses(BuildContext context) => Container(
     margin: const EdgeInsets.only(bottom: 10),
