@@ -111,11 +111,36 @@ class _HomeScreenState extends State<HomeScreen> {
             future: _future,
             builder: (context, snapshot) {
               final user = snapshot.data?[0] as Map<String, dynamic>?;
-              return IconButton(
-                onPressed: user == null ? null : () => _walletSheet(user),
-                icon: const Icon(Icons.account_balance_wallet_outlined),
-                color: AppColors.themeGold(context),
-                tooltip: 'Digital Wallet',
+              if (user == null) return const SizedBox.shrink();
+              final balance = user['walletBalance'] ?? 0;
+              return InkWell(
+                onTap: () => _walletSheet(user),
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.themeGold(context).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.themeGold(context).withValues(alpha: 0.4)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.account_balance_wallet_outlined, size: 18, color: AppColors.themeGold(context)),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Rs $balance',
+                        style: TextStyle(
+                          color: AppColors.themeGold(context),
+                          fontWeight: FontWeight.w900,
+                          fontSize: 13,
+                          fontFamily: 'JetBrains Mono',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               );
             },
           ),

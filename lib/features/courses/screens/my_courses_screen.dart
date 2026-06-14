@@ -20,6 +20,8 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
   final Set<String> _favorites = {};
   bool _showFavoritesOnly = false;
   bool _unlocking = false;
+  bool _isSearching = false;
+  final _searchController = TextEditingController();
   int _sectionIndex = 0;
 
   @override
@@ -58,14 +60,40 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Courses'),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                style: TextStyle(color: AppColors.text(context)),
+                decoration: InputDecoration(
+                  hintText: 'Search courses...',
+                  hintStyle: TextStyle(color: AppColors.mutedText(context)),
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                ),
+                onChanged: (value) => setState(() {}),
+              )
+            : const Text('Courses'),
         actions: [
           IconButton(
-            onPressed: () => setState(() => _showFavoritesOnly = !_showFavoritesOnly),
-            icon: Icon(_showFavoritesOnly ? Icons.favorite : Icons.favorite_border),
-            color: _showFavoritesOnly ? AppColors.error : AppColors.themeGold(context),
-            tooltip: 'Favorite courses',
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) _searchController.clear();
+              });
+            },
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            color: AppColors.themeGold(context),
+            tooltip: 'Search courses',
           ),
+          if (!_isSearching)
+            IconButton(
+              onPressed: () => setState(() => _showFavoritesOnly = !_showFavoritesOnly),
+              icon: Icon(_showFavoritesOnly ? Icons.favorite : Icons.favorite_border),
+              color: _showFavoritesOnly ? AppColors.error : AppColors.themeGold(context),
+              tooltip: 'Favorite courses',
+            ),
           const SizedBox(width: 8),
         ],
       ),
@@ -95,9 +123,13 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
               final user = snapshot.data![2] as Map<String, dynamic>;
               final progress = snapshot.data![3] as List<dynamic>;
               final bundle = bundleData['bundle'];
-              final visibleCourses = _showFavoritesOnly
+              final query = _searchController.text.trim().toLowerCase();
+              var visibleCourses = _showFavoritesOnly
                   ? courses.where((course) => _favorites.contains(course['_id'].toString())).toList()
                   : courses;
+              if (query.isNotEmpty) {
+                visibleCourses = visibleCourses.where((course) => (course['title'] ?? '').toString().toLowerCase().contains(query)).toList();
+              }
               final unlocked = (user['purchasedCourses'] as List<dynamic>? ?? []);
               final totalVideos = courses.fold<num>(0, (sum, course) => sum + _asNum(course['totalVideos']));
 
