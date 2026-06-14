@@ -124,7 +124,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(current?['title'] ?? 'Video')),
       body: _controller == null || !_controller!.value.isInitialized
-          ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+          ? Center(child: CircularProgressIndicator(color: AppColors.gold))
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
@@ -163,8 +163,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         alignment: Alignment.center,
         children: [
           AspectRatio(aspectRatio: controller.value.aspectRatio, child: VideoPlayer(controller)),
-          Positioned.fill(child: InkWell(onTap: _togglePlay, child: Center(child: AnimatedOpacity(opacity: _playing ? 0 : 1, duration: const Duration(milliseconds: 200), child: const Icon(Icons.play_circle_fill, color: AppColors.gold, size: 72))))),
-          Positioned(right: 8, top: 8, child: DecoratedBox(decoration: BoxDecoration(color: AppColors.primaryBg.withValues(alpha: .72), borderRadius: BorderRadius.circular(8)), child: Row(children: ['480p', '720p'].map((q) => Padding(padding: const EdgeInsets.only(left: 6), child: ChoiceChip(label: Text(q), selected: _quality == q, selectedColor: AppColors.gold, onSelected: (_) => _switchQuality(q)))).toList()))),
+          Positioned.fill(child: InkWell(onTap: _togglePlay, child: Center(child: AnimatedOpacity(opacity: _playing ? 0 : 1, duration: Duration(milliseconds: 200), child: Icon(Icons.play_circle_fill, color: AppColors.gold, size: 72))))),
+          Positioned(right: 8, top: 8, child: DecoratedBox(decoration: BoxDecoration(color: AppColors.primaryBg.withValues(alpha: .72), borderRadius: BorderRadius.circular(8)), child: Row(children: ['480p', '720p'].map((q) => Padding(padding: EdgeInsets.only(left: 6), child: ChoiceChip(label: Text(q), selected: _quality == q, selectedColor: AppColors.gold, onSelected: (_) => _switchQuality(q)))).toList()))),
           Positioned(left: 12, right: 12, bottom: 20, child: Column(mainAxisSize: MainAxisSize.min, children: [
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               _control(Icons.replay_10, () => _seekBy(-10)),
@@ -180,7 +180,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
             }).toList()),
           ])),
           const Positioned(left: 12, top: 12, child: Opacity(opacity: .28, child: Text('student@moneyfactory', style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)))),
-          Positioned(left: 0, right: 0, bottom: 0, child: VideoProgressIndicator(controller, allowScrubbing: true, colors: const VideoProgressColors(playedColor: AppColors.gold, bufferedColor: AppColors.muted, backgroundColor: AppColors.border))),
+          Positioned(left: 0, right: 0, bottom: 0, child: VideoProgressIndicator(controller, allowScrubbing: true, colors: VideoProgressColors(playedColor: AppColors.gold, bufferedColor: AppColors.muted, backgroundColor: AppColors.border))),
         ],
       ),
     );

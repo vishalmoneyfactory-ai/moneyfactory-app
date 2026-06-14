@@ -51,13 +51,13 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 36),
-              const Text('MONEY FACTORY', textAlign: TextAlign.center, style: TextStyle(color: AppColors.gold, fontSize: 34, fontWeight: FontWeight.w900)),
+              Text('MONEY FACTORY', textAlign: TextAlign.center, style: TextStyle(color: AppColors.themeGold(context), fontSize: 34, fontWeight: FontWeight.w900)),
               const SizedBox(height: 6),
-              const Text('Premium trading education', textAlign: TextAlign.center, style: TextStyle(color: AppColors.muted)),
+              Text('Premium trading education', textAlign: TextAlign.center, style: TextStyle(color: AppColors.mutedText(context))),
               const SizedBox(height: 32),
               Container(
-                decoration: BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.border)),
-                child: TabBar(controller: _tabs, indicatorColor: AppColors.gold, labelColor: AppColors.gold, tabs: const [Tab(text: 'Login'), Tab(text: 'Register')]),
+                decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.line(context))),
+                child: TabBar(controller: _tabs, indicatorColor: AppColors.themeGold(context), labelColor: AppColors.themeGold(context), tabs: const [Tab(text: 'Login'), Tab(text: 'Register')]),
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 child: TabBarView(
                   controller: _tabs,
                   children: [
-                    _form(children: [
+                    _form(context: context, children: [
                       TextField(controller: _email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Email')),
                       const SizedBox(height: 12),
                       TextField(controller: _password, obscureText: true, decoration: const InputDecoration(labelText: 'Password')),
@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       const SizedBox(height: 12),
                       OutlinedButton.icon(onPressed: _loading ? null : () => _run(() async => _auth.signInWithGoogle()), icon: const Icon(Icons.g_mobiledata), label: const Text('Continue with Google')),
                     ]),
-                    _form(children: [
+                    _form(context: context, children: [
                       TextField(controller: _name, decoration: const InputDecoration(labelText: 'Name')),
                       const SizedBox(height: 12),
                       TextField(controller: _phone, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Phone Number')),
@@ -101,5 +101,5 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     );
   }
 
-  Widget _form({required List<Widget> children}) => Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.border)), child: Column(children: children));
+  Widget _form({required BuildContext context, required List<Widget> children}) => Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.line(context))), child: Column(children: children));
 }

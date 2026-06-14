@@ -44,7 +44,7 @@ class CourseDetailScreen extends StatelessWidget {
                       border: Border.all(color: AppColors.line(context)),
                     ),
                     child: thumbnail.isEmpty
-                        ? const Center(
+                        ? Center(
                             child: Icon(
                               Icons.candlestick_chart,
                               color: AppColors.gold,
@@ -55,7 +55,7 @@ class CourseDetailScreen extends StatelessWidget {
                             imageUrl: thumbnail,
                             fit: BoxFit.cover,
                             width: double.infinity,
-                            errorWidget: (context, url, error) => const Center(
+                            errorWidget: (context, url, error) => Center(
                               child: Icon(
                                 Icons.candlestick_chart,
                                 color: AppColors.gold,

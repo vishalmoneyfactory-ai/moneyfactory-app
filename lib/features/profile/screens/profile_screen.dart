@@ -414,7 +414,7 @@ $link
             borderRadius: BorderRadius.circular(8),
           ),
           child: (course['thumbnail'] ?? '').toString().isEmpty
-              ? const Icon(Icons.school, color: AppColors.gold)
+              ? Icon(Icons.school, color: AppColors.gold)
               : CachedNetworkImage(
                   imageUrl: api.mediaUrl(course['thumbnail']),
                   fit: BoxFit.cover,
@@ -631,7 +631,7 @@ $link
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.manage_accounts, color: AppColors.gold),
+                    Icon(Icons.manage_accounts, color: AppColors.gold),
                     const SizedBox(width: 10),
                     const Text(
                       'Edit Account',

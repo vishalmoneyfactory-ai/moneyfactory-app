@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(children: [
-              const Icon(Icons.account_balance_wallet, color: AppColors.gold),
+              Icon(Icons.account_balance_wallet, color: AppColors.themeGold(context)),
               const SizedBox(width: 10),
               Text('Digital Wallet', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.text(context))),
             ]),
@@ -59,13 +59,13 @@ class _HomeScreenState extends State<HomeScreen> {
               decoration: BoxDecoration(
                 color: AppColors.goldGlow,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.gold.withValues(alpha: .45)),
-                boxShadow: [BoxShadow(color: AppColors.gold.withValues(alpha: .12), blurRadius: 18)],
+                border: Border.all(color: AppColors.themeGold(context).withValues(alpha: .45)),
+                boxShadow: [BoxShadow(color: AppColors.themeGold(context).withValues(alpha: .12), blurRadius: 18)],
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('Current Balance', style: TextStyle(color: AppColors.mutedText(context), fontWeight: FontWeight.w700)),
                 const SizedBox(height: 6),
-                Text('Rs ${user['walletBalance'] ?? 0}', style: const TextStyle(color: AppColors.gold, fontSize: 30, fontFamily: 'JetBrains Mono', fontWeight: FontWeight.w900)),
+                Text('Rs ${user['walletBalance'] ?? 0}', style: TextStyle(color: AppColors.themeGold(context), fontSize: 30, fontFamily: 'JetBrains Mono', fontWeight: FontWeight.w900)),
               ]),
             ),
             const SizedBox(height: 14),
@@ -114,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
               return IconButton(
                 onPressed: user == null ? null : () => _walletSheet(user),
                 icon: const Icon(Icons.account_balance_wallet_outlined),
-                color: AppColors.gold,
+                color: AppColors.themeGold(context),
                 tooltip: 'Digital Wallet',
               );
             },
@@ -125,13 +125,13 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Container(
         decoration: BoxDecoration(gradient: AppColors.pageGradient(context)),
         child: RefreshIndicator(
-          color: AppColors.gold,
+          color: AppColors.themeGold(context),
           onRefresh: _refresh,
           child: FutureBuilder<List<dynamic>>(
             future: _future,
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator(color: AppColors.gold));
+                return Center(child: CircularProgressIndicator(color: AppColors.themeGold(context)));
               }
               return ListView(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
@@ -157,8 +157,8 @@ class _HomeScreenState extends State<HomeScreen> {
     decoration: BoxDecoration(
       color: AppColors.card(context),
       borderRadius: BorderRadius.circular(8),
-      border: Border.all(color: AppColors.gold.withValues(alpha: .55), width: 1.2),
-      boxShadow: [BoxShadow(color: AppColors.gold.withValues(alpha: .10), blurRadius: 22, offset: const Offset(0, 10))],
+      border: Border.all(color: AppColors.themeGold(context).withValues(alpha: .55), width: 1.2),
+      boxShadow: [BoxShadow(color: AppColors.themeGold(context).withValues(alpha: .10), blurRadius: 22, offset: const Offset(0, 10))],
     ),
     child: ClipRRect(
       borderRadius: BorderRadius.circular(8),
@@ -171,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
   );
 
   Widget _description() => _panel([
-    const Text('The Money Factory indicator', style: TextStyle(color: AppColors.gold, fontSize: 24, fontWeight: FontWeight.w900)),
+    Text('The Money Factory indicator', style: TextStyle(color: AppColors.themeGold(context), fontSize: 24, fontWeight: FontWeight.w900)),
     const SizedBox(height: 12),
     Text(
       "Stop chasing lagging indicators. The Money Factory system reads the market's true DNA—Structure and Liquidity—making it an absolute weapon for trading Gold (XAU/USD).",
@@ -197,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
       text: TextSpan(
         style: TextStyle(color: AppColors.mutedText(context), height: 1.45),
         children: [
-          TextSpan(text: '$title: ', style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.w900)),
+          TextSpan(text: '$title: ', style: TextStyle(color: AppColors.themeGold(context), fontWeight: FontWeight.w900)),
           TextSpan(text: body),
         ],
       ),
@@ -219,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
       leading: CircleAvatar(backgroundColor: AppColors.neonBlue.withValues(alpha: .12), child: Icon(icon, color: AppColors.neonBlue)),
       title: Text(title, style: TextStyle(color: AppColors.text(context), fontWeight: FontWeight.w900)),
       subtitle: Text(subtitle, style: TextStyle(color: AppColors.mutedText(context))),
-      trailing: const Icon(Icons.open_in_new, color: AppColors.gold),
+      trailing: Icon(Icons.open_in_new, color: AppColors.themeGold(context)),
       onTap: onTap,
     ),
   );
@@ -242,17 +242,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _reviewTile(String name, double rating, String comment) => Container(
     margin: const EdgeInsets.only(bottom: 10),
     padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(color: AppColors.card(context).withValues(alpha: .92), borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.line(context)), boxShadow: [BoxShadow(color: AppColors.gold.withValues(alpha: .05), blurRadius: 14, offset: const Offset(0, 8))]),
+    decoration: BoxDecoration(color: AppColors.card(context).withValues(alpha: .92), borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.line(context)), boxShadow: [BoxShadow(color: AppColors.themeGold(context).withValues(alpha: .05), blurRadius: 14, offset: const Offset(0, 8))]),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
         Expanded(child: Text(name, style: TextStyle(color: AppColors.text(context), fontWeight: FontWeight.w900))),
-        Text('${rating.toStringAsFixed(1)}/5', style: const TextStyle(color: AppColors.gold, fontFamily: 'JetBrains Mono', fontWeight: FontWeight.w900)),
+        Text('${rating.toStringAsFixed(1)}/5', style: TextStyle(color: AppColors.themeGold(context), fontFamily: 'JetBrains Mono', fontWeight: FontWeight.w900)),
       ]),
       const SizedBox(height: 6),
       Row(children: List.generate(5, (index) {
         final value = index + 1;
-        if (rating >= value) return const Icon(Icons.star, color: AppColors.gold, size: 18);
-        if (rating > index) return const Icon(Icons.star_half, color: AppColors.gold, size: 18);
+        if (rating >= value) return Icon(Icons.star, color: AppColors.themeGold(context), size: 18);
+        if (rating > index) return Icon(Icons.star_half, color: AppColors.themeGold(context), size: 18);
         return Icon(Icons.star_border, color: AppColors.mutedText(context), size: 18);
       })),
       const SizedBox(height: 8),

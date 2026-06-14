@@ -6,7 +6,7 @@ class AppColors {
   static const cardBg = Color(0xFF151E2B);
   static const border = Color(0xFF283547);
   static const gold = Color(0xFFFFC857);
-  static const goldDark = Color(0xFFE2A72E);
+  static const goldDark = Color(0xFFB38000); // Darker, readable gold for light mode
   static const goldGlow = Color(0x33FFC857);
   static const neonBlue = Color(0xFF24C6FF);
   static const success = Color(0xFF00D084);
@@ -30,6 +30,7 @@ class AppColors {
   static Color line(BuildContext context) => isDark(context) ? border : lightBorder;
   static Color text(BuildContext context) => isDark(context) ? white : lightText;
   static Color mutedText(BuildContext context) => isDark(context) ? muted : lightMuted;
+  static Color themeGold(BuildContext context) => isDark(context) ? gold : goldDark;
   static LinearGradient pageGradient(BuildContext context) => isDark(context)
       ? const LinearGradient(
           colors: [Color(0xFF06080D), Color(0xFF0B1220), Color(0xFF111827)],

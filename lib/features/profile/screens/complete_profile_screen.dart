@@ -58,7 +58,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Phone number required', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.gold)),
+                Text('Phone number required', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.themeGold(context))),
                 const SizedBox(height: 8),
                 const Text('Please add your phone number before purchasing a course.', style: TextStyle(color: AppColors.muted)),
                 const SizedBox(height: 18),

@@ -63,7 +63,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
           IconButton(
             onPressed: () => setState(() => _showFavoritesOnly = !_showFavoritesOnly),
             icon: Icon(_showFavoritesOnly ? Icons.favorite : Icons.favorite_border),
-            color: _showFavoritesOnly ? AppColors.error : AppColors.gold,
+            color: _showFavoritesOnly ? AppColors.error : AppColors.themeGold(context),
             tooltip: 'Favorite courses',
           ),
           const SizedBox(width: 8),
@@ -72,7 +72,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
       body: Container(
         decoration: BoxDecoration(gradient: AppColors.pageGradient(context)),
         child: RefreshIndicator(
-          color: AppColors.gold,
+          color: AppColors.themeGold(context),
           onRefresh: _refresh,
           child: FutureBuilder<List<dynamic>>(
             future: _future,
@@ -87,7 +87,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                 );
               }
               if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator(color: AppColors.gold));
+                return Center(child: CircularProgressIndicator(color: AppColors.themeGold(context)));
               }
 
               final courses = (snapshot.data![0] as List<dynamic>).where((c) => c['isBundle'] != true).toList();
@@ -187,10 +187,10 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
         color: AppColors.card(context).withValues(alpha: .92),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.line(context)),
-        boxShadow: [BoxShadow(color: AppColors.gold.withValues(alpha: .06), blurRadius: 14, offset: const Offset(0, 8))],
+        boxShadow: [BoxShadow(color: AppColors.themeGold(context).withValues(alpha: .06), blurRadius: 14, offset: const Offset(0, 8))],
       ),
       child: Column(children: [
-        Text(value, style: const TextStyle(color: AppColors.gold, fontFamily: 'JetBrains Mono', fontSize: 20, fontWeight: FontWeight.w900)),
+        Text(value, style: TextStyle(color: AppColors.themeGold(context), fontFamily: 'JetBrains Mono', fontSize: 20, fontWeight: FontWeight.w900)),
         const SizedBox(height: 3),
         Text(label, style: TextStyle(color: AppColors.mutedText(context), fontSize: 12)),
       ]),
@@ -214,10 +214,10 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
           width: double.infinity,
           child: Stack(fit: StackFit.expand, children: [
             _courseImage(thumbnail),
-            Positioned(left: 12, top: 12, child: _pill(isFree ? 'FREE' : _priceText(course), isFree ? AppColors.success : AppColors.gold)),
+            Positioned(left: 12, top: 12, child: _pill(isFree ? 'FREE' : _priceText(course), isFree ? AppColors.success : AppColors.themeGold(context))),
             Positioned(right: 12, top: 12, child: IconButton.filledTonal(
               onPressed: () => setState(() => _favorites.contains(id) ? _favorites.remove(id) : _favorites.add(id)),
-              icon: Icon(_favorites.contains(id) ? Icons.favorite : Icons.favorite_border, color: _favorites.contains(id) ? AppColors.error : AppColors.gold),
+              icon: Icon(_favorites.contains(id) ? Icons.favorite : Icons.favorite_border, color: _favorites.contains(id) ? AppColors.error : AppColors.themeGold(context)),
             )),
             if (owned) Positioned(left: 12, bottom: 12, child: _pill('UNLOCKED', AppColors.success)),
           ]),
@@ -267,18 +267,18 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
       decoration: BoxDecoration(
         color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.gold, width: 1.4),
-        boxShadow: [BoxShadow(color: AppColors.gold.withValues(alpha: .08), blurRadius: 18)],
+        border: Border.all(color: AppColors.themeGold(context), width: 1.4),
+        boxShadow: [BoxShadow(color: AppColors.themeGold(context).withValues(alpha: .08), blurRadius: 18)],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('Complete Trading Mastery Bundle', style: TextStyle(color: AppColors.gold, fontSize: 21, fontWeight: FontWeight.w900)),
+        Text('Complete Trading Mastery Bundle', style: TextStyle(color: AppColors.themeGold(context), fontSize: 21, fontWeight: FontWeight.w900)),
         const SizedBox(height: 8),
         Text('All ${courses.length} courses, one unlock, discounted for the full roadmap.', style: TextStyle(color: AppColors.mutedText(context), height: 1.4)),
         const SizedBox(height: 12),
-        Wrap(spacing: 8, runSpacing: 8, children: courses.take(6).map((course) => _pill(course['title'] ?? '', AppColors.gold)).toList()),
+        Wrap(spacing: 8, runSpacing: 8, children: courses.take(6).map((course) => _pill(course['title'] ?? '', AppColors.themeGold(context))).toList()),
         const SizedBox(height: 14),
         Row(children: [
-          Expanded(child: Text(money(data['bundlePrice'] ?? bundle['price'] ?? 4999), style: const TextStyle(color: AppColors.gold, fontFamily: 'JetBrains Mono', fontSize: 28, fontWeight: FontWeight.w900))),
+          Expanded(child: Text(money(data['bundlePrice'] ?? bundle['price'] ?? 4999), style: TextStyle(color: AppColors.themeGold(context), fontFamily: 'JetBrains Mono', fontSize: 28, fontWeight: FontWeight.w900))),
           _pill('Save ${money(data['savings'] ?? 0)}', AppColors.success),
         ]),
         const SizedBox(height: 12),
@@ -297,7 +297,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: AppColors.card(context).withValues(alpha: .94), borderRadius: BorderRadius.circular(8), border: Border.all(color: expired ? AppColors.error.withValues(alpha: .45) : AppColors.line(context)), boxShadow: [BoxShadow(color: expired ? AppColors.error.withValues(alpha: .08) : AppColors.gold.withValues(alpha: .05), blurRadius: 14, offset: const Offset(0, 8))]),
+      decoration: BoxDecoration(color: AppColors.card(context).withValues(alpha: .94), borderRadius: BorderRadius.circular(8), border: Border.all(color: expired ? AppColors.error.withValues(alpha: .45) : AppColors.line(context)), boxShadow: [BoxShadow(color: expired ? AppColors.error.withValues(alpha: .08) : AppColors.themeGold(context).withValues(alpha: .05), blurRadius: 14, offset: const Offset(0, 8))]),
       child: Row(children: [
         Container(
           width: 76,
@@ -310,7 +310,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(course['title'], maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: AppColors.text(context), fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
-          LinearPercentIndicator(lineHeight: 6, padding: EdgeInsets.zero, percent: percent.clamp(0, 1).toDouble(), progressColor: AppColors.gold, backgroundColor: AppColors.line(context)),
+          LinearPercentIndicator(lineHeight: 6, padding: EdgeInsets.zero, percent: percent.clamp(0, 1).toDouble(), progressColor: AppColors.themeGold(context), backgroundColor: AppColors.line(context)),
           const SizedBox(height: 6),
           Text('$completed of $total videos', style: TextStyle(color: AppColors.mutedText(context), fontSize: 12)),
           const SizedBox(height: 4),
@@ -334,13 +334,13 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
 
   Widget _courseImage(String url) {
     if (url.isEmpty) {
-      return ColoredBox(color: AppColors.surface(context), child: const Center(child: Icon(Icons.show_chart, color: AppColors.gold, size: 42)));
+      return ColoredBox(color: AppColors.surface(context), child: Center(child: Icon(Icons.show_chart, color: AppColors.themeGold(context), size: 42)));
     }
     return CachedNetworkImage(
       imageUrl: url,
       fit: BoxFit.cover,
       width: double.infinity,
-      errorWidget: (_, _, _) => ColoredBox(color: AppColors.surface(context), child: const Center(child: Icon(Icons.show_chart, color: AppColors.gold, size: 42))),
+      errorWidget: (_, _, _) => ColoredBox(color: AppColors.surface(context), child: Center(child: Icon(Icons.show_chart, color: AppColors.themeGold(context), size: 42))),
     );
   }
 
@@ -348,7 +348,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
     padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
     decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.line(context))),
     child: Row(mainAxisSize: MainAxisSize.min, children: [
-      Icon(icon, size: 15, color: AppColors.gold),
+      Icon(icon, size: 15, color: AppColors.themeGold(context)),
       const SizedBox(width: 5),
       Text(label, style: TextStyle(fontSize: 12, color: AppColors.mutedText(context), fontWeight: FontWeight.w700)),
     ]),
@@ -362,10 +362,10 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
 
   Widget _priceRow(dynamic course) {
     if (course['isFree'] == true) return const Text('FREE', style: TextStyle(color: AppColors.success, fontFamily: 'JetBrains Mono', fontSize: 20, fontWeight: FontWeight.w900));
-    if (course['hasOffer'] != true) return Text(money(course['price'] ?? 0), style: const TextStyle(color: AppColors.gold, fontFamily: 'JetBrains Mono', fontSize: 20, fontWeight: FontWeight.w900));
+    if (course['hasOffer'] != true) return Text(money(course['price'] ?? 0), style: TextStyle(color: AppColors.themeGold(context), fontFamily: 'JetBrains Mono', fontSize: 20, fontWeight: FontWeight.w900));
     return Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 8, runSpacing: 4, children: [
       Text(money(course['originalPrice'] ?? course['price'] ?? 0), style: TextStyle(color: AppColors.mutedText(context), fontFamily: 'JetBrains Mono', decoration: TextDecoration.lineThrough, fontSize: 14, fontWeight: FontWeight.w700)),
-      Text(money(course['effectivePrice'] ?? course['price'] ?? 0), style: const TextStyle(color: AppColors.gold, fontFamily: 'JetBrains Mono', fontSize: 22, fontWeight: FontWeight.w900)),
+      Text(money(course['effectivePrice'] ?? course['price'] ?? 0), style: TextStyle(color: AppColors.themeGold(context), fontFamily: 'JetBrains Mono', fontSize: 22, fontWeight: FontWeight.w900)),
       _pill('${course['offerPercent'] ?? 0}% OFF', AppColors.success),
     ]);
   }
