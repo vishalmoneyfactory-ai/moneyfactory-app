@@ -43,11 +43,12 @@ class AuthService {
   Future<Map<String, dynamic>> _exchangeFirebaseToken(User? firebaseUser, {String? name, String? phone}) async {
     if (firebaseUser == null) throw Exception('Firebase user missing');
     final idToken = await firebaseUser.getIdToken();
-    final res = await _client.dio.post('/auth/verify-firebase', data: {
+    final body = <String, dynamic>{
       'idToken': idToken,
       'name': name ?? firebaseUser.displayName,
-      if (phone != null) 'phone': phone,
-    });
+    };
+    if (phone != null) body['phone'] = phone;
+    final res = await _client.dio.post('/auth/verify-firebase', data: body);
     await _storage.write(key: 'jwt', value: res.data['token']);
     await _syncFcm();
     return res.data['user'] as Map<String, dynamic>;

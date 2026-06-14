@@ -3,6 +3,44 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 class AppTheme {
+  static ThemeData get lightTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: AppColors.lightBg,
+      fontFamily: 'Inter',
+      colorScheme: const ColorScheme.light(
+        primary: AppColors.gold,
+        secondary: AppColors.neonBlue,
+        surface: AppColors.lightCard,
+        error: AppColors.error,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.lightBg,
+        foregroundColor: AppColors.lightText,
+        centerTitle: false,
+        elevation: 0,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: AppColors.lightSurface,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.lightBorder)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.lightBorder)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.gold)),
+      ),
+      cardTheme: CardThemeData(
+        color: AppColors.lightCard,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: const BorderSide(color: AppColors.lightBorder)),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.lightCard,
+        indicatorColor: AppColors.goldGlow,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) => TextStyle(color: states.contains(WidgetState.selected) ? AppColors.lightText : AppColors.lightMuted)),
+        iconTheme: WidgetStateProperty.resolveWith((states) => IconThemeData(color: states.contains(WidgetState.selected) ? AppColors.gold : AppColors.lightMuted)),
+      ),
+    );
+  }
+
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
@@ -11,7 +49,7 @@ class AppTheme {
       fontFamily: 'Inter',
       colorScheme: const ColorScheme.dark(
         primary: AppColors.gold,
-        secondary: AppColors.goldDark,
+        secondary: AppColors.neonBlue,
         surface: AppColors.cardBg,
         error: AppColors.error,
       ),
@@ -31,6 +69,12 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.cardBg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: const BorderSide(color: AppColors.border)),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.secondaryBg,
+        indicatorColor: AppColors.goldGlow,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) => TextStyle(color: states.contains(WidgetState.selected) ? AppColors.white : AppColors.muted)),
+        iconTheme: WidgetStateProperty.resolveWith((states) => IconThemeData(color: states.contains(WidgetState.selected) ? AppColors.gold : AppColors.muted)),
       ),
     );
   }

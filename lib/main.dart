@@ -8,6 +8,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 
+final rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 }
@@ -17,6 +19,13 @@ Future<void> main() async {
   await dotenv.load(fileName: '.env');
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onMessage.listen((message) {
+    final body = message.notification?.body;
+    if (body == null || body.isEmpty) return;
+    rootScaffoldMessengerKey.currentState?.showSnackBar(
+      SnackBar(content: Text(body), backgroundColor: const Color(0xFF00C853)),
+    );
+  });
   await Hive.initFlutter();
   await Hive.openBox('progress');
   runApp(const ProviderScope(child: MoneyFactoryApp()));
@@ -31,7 +40,10 @@ class MoneyFactoryApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Money Factory',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
       routerConfig: router,
     );
   }

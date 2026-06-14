@@ -104,18 +104,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Future<void> _success(PaymentSuccessResponse response) async {
-    final result = await api.verifyPayment({
+    await api.verifyPayment({
       'razorpayOrderId': response.orderId ?? _order?['orderId'],
       'razorpayPaymentId': response.paymentId,
       'razorpaySignature': response.signature,
     });
     if (!mounted) return;
-    final reward = result['referralReward'];
-    if (reward != null) {
-      _snack('\u20b9${reward['rewardAmount']} has been credited to your Money Factory Wallet. The amount will be transferred to your bank account shortly.', AppColors.success);
-    } else {
-      _snack('Payment successful', AppColors.success);
-    }
+    _snack('Payment successful', AppColors.success);
     context.go('/learning');
   }
 

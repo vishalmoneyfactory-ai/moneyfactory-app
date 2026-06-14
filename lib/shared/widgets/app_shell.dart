@@ -38,7 +38,7 @@ class AppShell extends StatelessWidget {
             if (value == 1) context.go('/learning');
             if (value == 2) context.go('/profile');
           },
-          backgroundColor: AppColors.secondaryBg,
+          backgroundColor: AppColors.card(context),
           indicatorColor: AppColors.goldGlow,
           destinations: const [
             NavigationDestination(
@@ -49,7 +49,7 @@ class AppShell extends StatelessWidget {
             NavigationDestination(
               icon: Icon(Icons.school_outlined),
               selectedIcon: Icon(Icons.school),
-              label: 'Learning',
+              label: 'Courses',
             ),
             NavigationDestination(
               icon: Icon(Icons.person_outline),
