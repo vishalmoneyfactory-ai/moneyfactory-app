@@ -146,7 +146,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   const SizedBox(height: 8),
                   Text(
                     _course!['shortDescription'] ?? '',
-                    style: const TextStyle(color: AppColors.muted),
+                    style: TextStyle(color: AppColors.mutedText(context)),
                   ),
                 ]),
                 const SizedBox(height: 14),
@@ -195,7 +195,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     '-${money(_discount)}',
                     color: AppColors.success,
                   ),
-                  const Divider(color: AppColors.border),
+                  Divider(color: AppColors.line(context)),
                   _line('Total', money(total), color: AppColors.gold),
                 ]),
                 if (!widget.isBundle) ...[
@@ -229,9 +229,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget _box(List<Widget> children) => Container(
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: AppColors.cardBg,
+      color: AppColors.card(context),
       borderRadius: BorderRadius.circular(8),
-      border: Border.all(color: AppColors.border),
+      border: Border.all(color: AppColors.line(context)),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,16 +247,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     padding: const EdgeInsets.symmetric(vertical: 6),
     child: Row(
       children: [
-        Text(label, style: const TextStyle(color: AppColors.muted)),
+        Text(label, style: TextStyle(color: AppColors.mutedText(context))),
         const Spacer(),
         Text(
           value,
           style: TextStyle(
-            color: color ?? (mutedStrike ? AppColors.muted : AppColors.white),
+            color: color ?? (mutedStrike ? AppColors.mutedText(context) : AppColors.text(context)),
             fontFamily: 'JetBrains Mono',
             fontWeight: FontWeight.w800,
             decoration: mutedStrike ? TextDecoration.lineThrough : null,
-            decorationColor: AppColors.muted,
+            decorationColor: AppColors.mutedText(context),
           ),
         ),
       ],

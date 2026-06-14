@@ -20,6 +20,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
   final Set<String> _favorites = {};
   bool _showFavoritesOnly = false;
   bool _unlocking = false;
+  int _sectionIndex = 0;
 
   @override
   void initState() {
@@ -68,59 +69,105 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      body: RefreshIndicator(
-        color: AppColors.gold,
-        onRefresh: _refresh,
-        child: FutureBuilder<List<dynamic>>(
-          future: _future,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.7,
-                  child: Center(child: Text(snapshot.error.toString(), textAlign: TextAlign.center)),
-                ),
-              );
-            }
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.gold));
-            }
+      body: Container(
+        decoration: BoxDecoration(gradient: AppColors.pageGradient(context)),
+        child: RefreshIndicator(
+          color: AppColors.gold,
+          onRefresh: _refresh,
+          child: FutureBuilder<List<dynamic>>(
+            future: _future,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    child: Center(child: Text(snapshot.error.toString(), textAlign: TextAlign.center)),
+                  ),
+                );
+              }
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator(color: AppColors.gold));
+              }
 
-            final courses = (snapshot.data![0] as List<dynamic>).where((c) => c['isBundle'] != true).toList();
-            final bundleData = snapshot.data![1] as Map<String, dynamic>;
-            final user = snapshot.data![2] as Map<String, dynamic>;
-            final progress = snapshot.data![3] as List<dynamic>;
-            final bundle = bundleData['bundle'];
-            final visibleCourses = _showFavoritesOnly
-                ? courses.where((course) => _favorites.contains(course['_id'].toString())).toList()
-                : courses;
-            final unlocked = (user['purchasedCourses'] as List<dynamic>? ?? []);
-            final totalVideos = courses.fold<num>(0, (sum, course) => sum + _asNum(course['totalVideos']));
+              final courses = (snapshot.data![0] as List<dynamic>).where((c) => c['isBundle'] != true).toList();
+              final bundleData = snapshot.data![1] as Map<String, dynamic>;
+              final user = snapshot.data![2] as Map<String, dynamic>;
+              final progress = snapshot.data![3] as List<dynamic>;
+              final bundle = bundleData['bundle'];
+              final visibleCourses = _showFavoritesOnly
+                  ? courses.where((course) => _favorites.contains(course['_id'].toString())).toList()
+                  : courses;
+              final unlocked = (user['purchasedCourses'] as List<dynamic>? ?? []);
+              final totalVideos = courses.fold<num>(0, (sum, course) => sum + _asNum(course['totalVideos']));
 
-            return ListView(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-              children: [
-                _counterRow(courses.length + (bundle == null ? 0 : 1), totalVideos, unlocked.where((c) => c['isExpired'] != true).length),
-                const SizedBox(height: 18),
-                _sectionHeader('Courses', _showFavoritesOnly ? 'Favorite sorted courses' : 'All programs and bundle'),
-                const SizedBox(height: 10),
-                if (_showFavoritesOnly && visibleCourses.isEmpty)
-                  _emptyBox('No favorite courses selected yet')
-                else ...[
-                  ...visibleCourses.map((course) => _courseCard(context, course)),
-                  if (!_showFavoritesOnly) _bundleCard(context, bundleData),
+              return ListView(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+                children: [
+                  _counterRow(courses.length + (bundle == null ? 0 : 1), totalVideos, unlocked.where((c) => c['isExpired'] != true).length),
+                  const SizedBox(height: 16),
+                  _segmentedHeader(),
+                  const SizedBox(height: 16),
+                  if (_sectionIndex == 0) ...[
+                    _sectionHeader('Courses', _showFavoritesOnly ? 'Favorite sorted courses' : 'All programs and bundle'),
+                    const SizedBox(height: 10),
+                    if (_showFavoritesOnly && visibleCourses.isEmpty)
+                      _emptyBox('No favorite courses selected yet')
+                    else ...[
+                      ...visibleCourses.map((course) => _courseCard(context, course)),
+                      if (!_showFavoritesOnly) _bundleCard(context, bundleData),
+                    ],
+                  ] else ...[
+                    _sectionHeader('My learning', 'Unlocked courses with validity'),
+                    const SizedBox(height: 10),
+                    if (unlocked.isEmpty)
+                      _emptyBox('No unlocked courses yet')
+                    else
+                      ...unlocked.map((course) => _learningCard(context, course, progress)),
+                  ],
                 ],
-                const SizedBox(height: 22),
-                _sectionHeader('My learning', 'Unlocked courses with validity'),
-                const SizedBox(height: 10),
-                if (unlocked.isEmpty)
-                  _emptyBox('No unlocked courses yet')
-                else
-                  ...unlocked.map((course) => _learningCard(context, course, progress)),
-              ],
-            );
-          },
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _segmentedHeader() => Container(
+    padding: const EdgeInsets.all(5),
+    decoration: BoxDecoration(
+      color: AppColors.card(context).withValues(alpha: .82),
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(color: AppColors.line(context)),
+      boxShadow: [BoxShadow(color: AppColors.neonBlue.withValues(alpha: .08), blurRadius: 18, offset: const Offset(0, 8))],
+    ),
+    child: Row(children: [
+      _segmentButton(0, 'Courses', Icons.auto_stories_outlined),
+      _segmentButton(1, 'My Learning', Icons.play_circle_outline),
+    ]),
+  );
+
+  Widget _segmentButton(int index, String label, IconData icon) {
+    final active = _sectionIndex == index;
+    return Expanded(
+      child: InkWell(
+        onTap: () => setState(() => _sectionIndex = index),
+        borderRadius: BorderRadius.circular(8),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          height: 46,
+          decoration: BoxDecoration(
+            gradient: active ? AppColors.accentGradient(context) : null,
+            color: active ? null : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: active ? [BoxShadow(color: AppColors.neonBlue.withValues(alpha: .20), blurRadius: 14)] : null,
+          ),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Icon(icon, size: 18, color: active ? AppColors.white : AppColors.mutedText(context)),
+            const SizedBox(width: 7),
+            Text(label, style: TextStyle(color: active ? AppColors.white : AppColors.mutedText(context), fontWeight: FontWeight.w900)),
+          ]),
         ),
       ),
     );
@@ -137,9 +184,10 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 4),
       padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
-        color: AppColors.card(context),
+        color: AppColors.card(context).withValues(alpha: .92),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.line(context)),
+        boxShadow: [BoxShadow(color: AppColors.gold.withValues(alpha: .06), blurRadius: 14, offset: const Offset(0, 8))],
       ),
       child: Column(children: [
         Text(value, style: const TextStyle(color: AppColors.gold, fontFamily: 'JetBrains Mono', fontSize: 20, fontWeight: FontWeight.w900)),
@@ -158,7 +206,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
     final label = owned ? 'Continue' : isFree ? 'Unlock' : expired ? 'Repurchase' : 'Buy Now';
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
-      decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.line(context))),
+      decoration: BoxDecoration(color: AppColors.card(context).withValues(alpha: .94), borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.line(context)), boxShadow: [BoxShadow(color: AppColors.neonBlue.withValues(alpha: .07), blurRadius: 18, offset: const Offset(0, 8))]),
       clipBehavior: Clip.antiAlias,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         SizedBox(
@@ -249,7 +297,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(8), border: Border.all(color: expired ? AppColors.error.withValues(alpha: .45) : AppColors.line(context))),
+      decoration: BoxDecoration(color: AppColors.card(context).withValues(alpha: .94), borderRadius: BorderRadius.circular(8), border: Border.all(color: expired ? AppColors.error.withValues(alpha: .45) : AppColors.line(context)), boxShadow: [BoxShadow(color: expired ? AppColors.error.withValues(alpha: .08) : AppColors.gold.withValues(alpha: .05), blurRadius: 14, offset: const Offset(0, 8))]),
       child: Row(children: [
         Container(
           width: 76,

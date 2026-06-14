@@ -39,9 +39,9 @@ class CourseDetailScreen extends StatelessWidget {
                     height: 190,
                     clipBehavior: Clip.antiAlias,
                     decoration: BoxDecoration(
-                      color: AppColors.secondaryBg,
+                      color: AppColors.surface(context),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(color: AppColors.line(context)),
                     ),
                     child: thumbnail.isEmpty
                         ? const Center(
@@ -73,18 +73,26 @@ class CourseDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  _priceRow(course),
+                  _priceRow(context, course),
                   if (course['access'] != null) ...[
                     const SizedBox(height: 8),
                     Text(
                       _accessLabel(course['access']),
-                      style: TextStyle(color: expired ? AppColors.error : AppColors.muted, fontWeight: expired ? FontWeight.w800 : FontWeight.w500),
+                      style: TextStyle(
+                        color: expired
+                            ? AppColors.error
+                            : AppColors.mutedText(context),
+                        fontWeight: expired ? FontWeight.w800 : FontWeight.w500,
+                      ),
                     ),
                   ],
                   const SizedBox(height: 12),
                   Text(
                     course['shortDescription'] ?? '',
-                    style: const TextStyle(color: AppColors.muted, height: 1.5),
+                    style: TextStyle(
+                      color: AppColors.mutedText(context),
+                      height: 1.5,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   ExpansionTile(
@@ -112,9 +120,9 @@ class CourseDetailScreen extends StatelessWidget {
                     (v) => Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       decoration: BoxDecoration(
-                        color: AppColors.cardBg,
+                        color: AppColors.card(context),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: AppColors.line(context)),
                       ),
                       child: ListTile(
                         leading: Icon(
@@ -123,7 +131,7 @@ class CourseDetailScreen extends StatelessWidget {
                               : Icons.lock,
                           color: v['isFreePreview'] == true || owned
                               ? AppColors.gold
-                              : AppColors.muted,
+                              : AppColors.mutedText(context),
                         ),
                         title: Text(v['title']),
                         subtitle: Text(durationLabel(v['duration'] ?? 0)),
@@ -138,7 +146,10 @@ class CourseDetailScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   Text(
                     course['description'] ?? '',
-                    style: const TextStyle(color: AppColors.muted, height: 1.6),
+                    style: TextStyle(
+                      color: AppColors.mutedText(context),
+                      height: 1.6,
+                    ),
                   ),
                 ],
               ),
@@ -148,13 +159,17 @@ class CourseDetailScreen extends StatelessWidget {
                 bottom: 0,
                 child: Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: AppColors.secondaryBg,
-                    border: Border(top: BorderSide(color: AppColors.border)),
+                  decoration: BoxDecoration(
+                    color: AppColors.card(context),
+                    border: Border(
+                      top: BorderSide(color: AppColors.line(context)),
+                    ),
                   ),
                   child: Row(
                     children: [
-                      Expanded(child: _priceRow(course, compact: true)),
+                      Expanded(
+                        child: _priceRow(context, course, compact: true),
+                      ),
                       Expanded(
                         child: GoldButton(
                           label: owned
@@ -227,7 +242,11 @@ class CourseDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _priceRow(Map<String, dynamic> course, {bool compact = false}) {
+  Widget _priceRow(
+    BuildContext context,
+    Map<String, dynamic> course, {
+    bool compact = false,
+  }) {
     if (course['isFree'] == true) {
       return Text(
         'FREE',
@@ -258,10 +277,10 @@ class CourseDetailScreen extends StatelessWidget {
         Text(
           money(course['originalPrice'] ?? course['price'] ?? 0),
           style: TextStyle(
-            color: AppColors.muted,
+            color: AppColors.mutedText(context),
             fontFamily: 'JetBrains Mono',
             decoration: TextDecoration.lineThrough,
-            decorationColor: AppColors.muted,
+            decorationColor: AppColors.mutedText(context),
             fontSize: compact ? 13 : 16,
             fontWeight: FontWeight.w700,
           ),
@@ -295,11 +314,13 @@ class CourseDetailScreen extends StatelessWidget {
   }
 
   String _accessLabel(Map<String, dynamic> access) {
-    if (access['isExpired'] == true) return 'Course Expired - Repurchase Required.';
+    if (access['isExpired'] == true)
+      return 'Course Expired - Repurchase Required.';
     final days = access['daysRemaining'];
     if (days is num) return '$days Days Remaining';
     final expiry = access['expiryDate'];
-    if (expiry != null) return 'Expiry Date: ${expiry.toString().split('T').first}';
+    if (expiry != null)
+      return 'Expiry Date: ${expiry.toString().split('T').first}';
     if (access['isOwned'] == true) return 'Lifetime Access';
     return '';
   }

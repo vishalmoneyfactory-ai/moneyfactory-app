@@ -122,28 +122,31 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      body: RefreshIndicator(
-        color: AppColors.gold,
-        onRefresh: _refresh,
-        child: FutureBuilder<List<dynamic>>(
-          future: _future,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.gold));
-            }
-            return ListView(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-              children: [
-                _ownerFrame(),
-                const SizedBox(height: 18),
-                _description(),
-                const SizedBox(height: 18),
-                _socials(),
-                const SizedBox(height: 18),
-                _reviews(),
-              ],
-            );
-          },
+      body: Container(
+        decoration: BoxDecoration(gradient: AppColors.pageGradient(context)),
+        child: RefreshIndicator(
+          color: AppColors.gold,
+          onRefresh: _refresh,
+          child: FutureBuilder<List<dynamic>>(
+            future: _future,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator(color: AppColors.gold));
+              }
+              return ListView(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+                children: [
+                  _ownerFrame(),
+                  const SizedBox(height: 18),
+                  _description(),
+                  const SizedBox(height: 18),
+                  _socials(),
+                  const SizedBox(height: 18),
+                  _reviews(),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -159,7 +162,11 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
     child: ClipRRect(
       borderRadius: BorderRadius.circular(8),
-      child: Image.asset('assets/images/owner.jpeg', height: 320, width: double.infinity, fit: BoxFit.cover),
+      child: Container(
+        height: 340,
+        color: AppColors.surface(context),
+        child: Image.asset('assets/images/owner-1.png', width: double.infinity, fit: BoxFit.contain),
+      ),
     ),
   );
 
@@ -183,7 +190,8 @@ class _HomeScreenState extends State<HomeScreen> {
     decoration: BoxDecoration(
       color: AppColors.surface(context).withValues(alpha: .72),
       borderRadius: BorderRadius.circular(8),
-      border: Border.all(color: AppColors.neonBlue.withValues(alpha: .28)),
+      border: Border.all(color: AppColors.neonBlue.withValues(alpha: .32)),
+      boxShadow: [BoxShadow(color: AppColors.neonBlue.withValues(alpha: .06), blurRadius: 16)],
     ),
     child: RichText(
       text: TextSpan(
@@ -206,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _socialTile(IconData icon, String title, String subtitle, VoidCallback onTap) => Container(
     margin: const EdgeInsets.only(bottom: 10),
-    decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.line(context))),
+    decoration: BoxDecoration(color: AppColors.card(context).withValues(alpha: .92), borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.line(context)), boxShadow: [BoxShadow(color: AppColors.neonBlue.withValues(alpha: .06), blurRadius: 16, offset: const Offset(0, 8))]),
     child: ListTile(
       leading: CircleAvatar(backgroundColor: AppColors.neonBlue.withValues(alpha: .12), child: Icon(icon, color: AppColors.neonBlue)),
       title: Text(title, style: TextStyle(color: AppColors.text(context), fontWeight: FontWeight.w900)),
@@ -234,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _reviewTile(String name, double rating, String comment) => Container(
     margin: const EdgeInsets.only(bottom: 10),
     padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.line(context))),
+    decoration: BoxDecoration(color: AppColors.card(context).withValues(alpha: .92), borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.line(context)), boxShadow: [BoxShadow(color: AppColors.gold.withValues(alpha: .05), blurRadius: 14, offset: const Offset(0, 8))]),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
         Expanded(child: Text(name, style: TextStyle(color: AppColors.text(context), fontWeight: FontWeight.w900))),

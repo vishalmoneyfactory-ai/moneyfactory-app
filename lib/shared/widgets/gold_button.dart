@@ -24,7 +24,9 @@ class GoldButton extends StatelessWidget {
           foregroundColor: color == AppColors.success ? AppColors.white : AppColors.primaryBg,
           disabledBackgroundColor: AppColors.disabled,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          textStyle: const TextStyle(fontWeight: FontWeight.w800),
+          textStyle: const TextStyle(fontWeight: FontWeight.w900),
+          shadowColor: (color ?? AppColors.gold).withValues(alpha: .35),
+          elevation: 6,
         ),
       ),
     );

@@ -14,6 +14,7 @@ class AppTheme {
         secondary: AppColors.neonBlue,
         surface: AppColors.lightCard,
         error: AppColors.error,
+        onSurface: AppColors.lightText,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.lightBg,
@@ -31,6 +32,12 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.lightCard,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: const BorderSide(color: AppColors.lightBorder)),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(foregroundColor: AppColors.lightText, side: const BorderSide(color: AppColors.lightBorder), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.lightCard,
@@ -52,6 +59,7 @@ class AppTheme {
         secondary: AppColors.neonBlue,
         surface: AppColors.cardBg,
         error: AppColors.error,
+        onSurface: AppColors.white,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.primaryBg,
@@ -69,6 +77,12 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.cardBg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: const BorderSide(color: AppColors.border)),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(foregroundColor: AppColors.white, side: const BorderSide(color: AppColors.border), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.secondaryBg,
