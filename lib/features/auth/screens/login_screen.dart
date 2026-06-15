@@ -60,13 +60,32 @@ class _LoginScreenState extends State<LoginScreen> {
             padding: const EdgeInsets.fromLTRB(24, 34, 24, 28),
             children: [
               FadeSlideIn(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('MONEY FACTORY', style: TextStyle(color: AppColors.themeGold(context), fontSize: 38, height: .95, fontWeight: FontWeight.w900)),
-                  const SizedBox(height: 10),
-                  Text(_signup ? 'Create your trading account.' : 'Welcome back to your trading desk.', style: TextStyle(color: AppColors.text(context), fontSize: 28, height: 1.08, fontWeight: FontWeight.w900)),
-                  const SizedBox(height: 12),
-                  Text('Premium trading education, secure videos, and 30-day course access.', style: TextStyle(color: AppColors.mutedText(context), height: 1.5)),
-                ]),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'MONEY FACTORY',
+                      style: TextStyle(
+                        color: AppColors.themeGold(context),
+                        fontFamily: 'JetBrains Mono',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 2.0,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      _signup ? 'Create Account.' : 'Welcome Back.',
+                      style: TextStyle(
+                        color: AppColors.text(context),
+                        fontSize: 40,
+                        height: 1.1,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 34),
               FadeSlideIn(
