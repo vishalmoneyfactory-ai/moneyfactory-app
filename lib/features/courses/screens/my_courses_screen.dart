@@ -459,12 +459,53 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
             ],
           ),
           const SizedBox(height: 10),
-          Text(
-            _validityLabel(course['access']),
-            style: TextStyle(
-              color: expired ? AppColors.error : AppColors.mutedText(context),
-              fontWeight: expired ? FontWeight.w800 : FontWeight.w600,
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Text(
+                  _validityLabel(course['access']),
+                  style: TextStyle(
+                    color: expired ? AppColors.error : AppColors.mutedText(context),
+                    fontWeight: expired ? FontWeight.w800 : FontWeight.w600,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 36,
+                child: OutlinedButton.icon(
+                  onPressed: () => setState(
+                    () => _favorites.contains(id)
+                        ? _favorites.remove(id)
+                        : _favorites.add(id),
+                  ),
+                  icon: Icon(
+                    _favorites.contains(id)
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                    color: _favorites.contains(id)
+                        ? AppColors.error
+                        : AppColors.themeGold(context),
+                    size: 18,
+                  ),
+                  label: Text(
+                    _favorites.contains(id) ? 'Saved' : 'Save',
+                    style: TextStyle(
+                      color: AppColors.text(context),
+                      fontWeight: FontWeight.w800,
+                      fontSize: 13,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: AppColors.line(context)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Row(
@@ -490,34 +531,10 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              OutlinedButton.icon(
-                onPressed: () => setState(
-                  () => _favorites.contains(id)
-                      ? _favorites.remove(id)
-                      : _favorites.add(id),
-                ),
-                icon: Icon(
-                  _favorites.contains(id)
-                      ? Icons.favorite
-                      : Icons.favorite_border,
-                  color: _favorites.contains(id)
-                      ? AppColors.error
-                      : AppColors.themeGold(context),
-                ),
-                label: Text(
-                  _favorites.contains(id) ? 'Saved' : 'Save',
-                  style: TextStyle(
-                    color: AppColors.text(context),
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: AppColors.line(context)),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
+              TextButton.icon(
+                onPressed: () => context.push('/course/$id'),
+                icon: const Icon(Icons.north_east),
+                label: const Text('Explore'),
               ),
             ],
           ),
