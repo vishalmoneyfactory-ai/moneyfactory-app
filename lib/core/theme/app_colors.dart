@@ -6,7 +6,7 @@ class AppColors {
   static const cardBg = Color(0xFF151E2B);
   static const border = Color(0xFF283547);
   static const gold = Color(0xFFFFC857);
-  static const goldDark = Color(0xFFB38000); // Darker, readable gold for light mode
+  static const goldDark = Color(0xFF997300); // Darker, rich gold for light mode
   static const goldGlow = Color(0x33FFC857);
   static const neonBlue = Color(0xFF24C6FF);
   static const success = Color(0xFF00D084);

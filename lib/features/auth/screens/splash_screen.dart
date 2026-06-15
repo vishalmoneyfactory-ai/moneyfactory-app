@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -31,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: AppColors.bg(context),
       body: Center(
         child: Image.asset(
-          'assets/images/splash_logo.png',
+          'assets/images/image.png',
           width: 260,
           fit: BoxFit.contain,
         ),

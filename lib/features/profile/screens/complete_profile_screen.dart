@@ -20,7 +20,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     final phone = _phone.text.trim();
     if (phone.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please add your phone number before purchasing a course.'), backgroundColor: AppColors.error),
+        const SnackBar(
+          content: Text(
+            'Please add your phone number before purchasing a course.',
+          ),
+          backgroundColor: AppColors.error,
+        ),
       );
       return;
     }
@@ -29,12 +34,20 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       await api.updateMe({'phone': phone});
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Phone number saved'), backgroundColor: AppColors.success),
+        const SnackBar(
+          content: Text('Phone number saved'),
+          backgroundColor: AppColors.success,
+        ),
       );
       context.pop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: AppColors.error,
+          ),
+        );
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -45,34 +58,49 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Complete Profile')),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.cardBg,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: Column(
+      body: Container(
+        decoration: BoxDecoration(gradient: AppColors.pageGradient(context)),
+        child: ListView(
+          padding: const EdgeInsets.all(22),
+          children: [
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Phone number required', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.themeGold(context))),
-                const SizedBox(height: 8),
-                const Text('Please add your phone number before purchasing a course.', style: TextStyle(color: AppColors.muted)),
-                const SizedBox(height: 18),
+                Text(
+                  'Phone number required',
+                  style: TextStyle(
+                    fontSize: 34,
+                    height: 1,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.themeGold(context),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Please add your phone number before purchasing a course.',
+                  style: TextStyle(
+                    color: AppColors.mutedText(context),
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 28),
                 TextField(
                   controller: _phone,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(labelText: 'Phone Number', prefixIcon: Icon(Icons.phone_outlined)),
+                  decoration: const InputDecoration(
+                    labelText: 'Phone Number',
+                    prefixIcon: Icon(Icons.phone_outlined),
+                  ),
                 ),
-                const SizedBox(height: 18),
-                GoldButton(label: _saving ? 'Saving...' : 'Save Phone Number', onPressed: _saving ? null : _save),
+                const SizedBox(height: 22),
+                GoldButton(
+                  label: _saving ? 'Saving...' : 'Save Phone Number',
+                  onPressed: _saving ? null : _save,
+                ),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

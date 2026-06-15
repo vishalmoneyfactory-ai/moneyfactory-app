@@ -76,7 +76,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'courseId': widget.courseId,
         'isBundle': widget.isBundle,
         'couponCode': _coupon.text.trim().isEmpty ? null : _coupon.text.trim(),
-        'referralCode': _referral.text.trim().isEmpty ? null : _referral.text.trim(),
+        'referralCode': _referral.text.trim().isEmpty
+            ? null
+            : _referral.text.trim(),
       });
       _order = order;
       _razorpay.open({
@@ -92,8 +94,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'theme': {'color': '#FFD700'},
       });
     } catch (e) {
-      if (e is DioException && e.response?.data is Map && e.response?.data['code'] == 'PHONE_REQUIRED') {
-        _snack('Please add your phone number before purchasing a course.', AppColors.error);
+      if (e is DioException &&
+          e.response?.data is Map &&
+          e.response?.data['code'] == 'PHONE_REQUIRED') {
+        _snack(
+          'Please add your phone number before purchasing a course.',
+          AppColors.error,
+        );
         if (mounted) context.push('/complete-profile');
         return;
       }
@@ -252,7 +259,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         Text(
           value,
           style: TextStyle(
-            color: color ?? (mutedStrike ? AppColors.mutedText(context) : AppColors.text(context)),
+            color:
+                color ??
+                (mutedStrike
+                    ? AppColors.mutedText(context)
+                    : AppColors.text(context)),
             fontFamily: 'JetBrains Mono',
             fontWeight: FontWeight.w800,
             decoration: mutedStrike ? TextDecoration.lineThrough : null,

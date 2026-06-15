@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -17,20 +18,89 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     routes: [
-      GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
-      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(
+        path: '/',
+        pageBuilder: (context, state) => _page(state, const SplashScreen()),
+      ),
+      GoRoute(
+        path: '/login',
+        pageBuilder: (context, state) => _page(state, const LoginScreen()),
+      ),
       ShellRoute(
-        builder: (context, state, child) => BackToHomeScope(child: AppShell(child: child)),
+        builder: (context, state, child) =>
+            BackToHomeScope(child: AppShell(child: child)),
         routes: [
-          GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-          GoRoute(path: '/learning', builder: (context, state) => const MyCoursesScreen()),
-          GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
+          GoRoute(
+            path: '/home',
+            pageBuilder: (context, state) => _page(state, const HomeScreen()),
+          ),
+          GoRoute(
+            path: '/learning',
+            pageBuilder: (context, state) =>
+                _page(state, const MyCoursesScreen()),
+          ),
+          GoRoute(
+            path: '/profile',
+            pageBuilder: (context, state) =>
+                _page(state, const ProfileScreen()),
+          ),
         ],
       ),
-      GoRoute(path: '/course/:id', builder: (context, state) => BackToHomeScope(child: CourseDetailScreen(courseId: state.pathParameters['id']!))),
-      GoRoute(path: '/complete-profile', builder: (context, state) => const CompleteProfileScreen()),
-      GoRoute(path: '/checkout/:id', builder: (context, state) => BackToHomeScope(child: CheckoutScreen(courseId: state.pathParameters['id']!, isBundle: state.uri.queryParameters['bundle'] == 'true'))),
-      GoRoute(path: '/video/:id', builder: (context, state) => BackToHomeScope(child: VideoPlayerScreen(videoId: state.pathParameters['id']!, courseId: state.uri.queryParameters['course'] ?? ''))),
+      GoRoute(
+        path: '/course/:id',
+        pageBuilder: (context, state) => _page(
+          state,
+          BackToHomeScope(
+            child: CourseDetailScreen(courseId: state.pathParameters['id']!),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: '/complete-profile',
+        pageBuilder: (context, state) =>
+            _page(state, const CompleteProfileScreen()),
+      ),
+      GoRoute(
+        path: '/checkout/:id',
+        pageBuilder: (context, state) => _page(
+          state,
+          BackToHomeScope(
+            child: CheckoutScreen(
+              courseId: state.pathParameters['id']!,
+              isBundle: state.uri.queryParameters['bundle'] == 'true',
+            ),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: '/video/:id',
+        pageBuilder: (context, state) => _page(
+          state,
+          BackToHomeScope(
+            child: VideoPlayerScreen(
+              videoId: state.pathParameters['id']!,
+              courseId: state.uri.queryParameters['course'] ?? '',
+            ),
+          ),
+        ),
+      ),
     ],
   );
 });
+
+CustomTransitionPage<void> _page(GoRouterState state, Widget child) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final offset = Tween<Offset>(
+        begin: const Offset(.035, .015),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
+      return FadeTransition(
+        opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+        child: SlideTransition(position: offset, child: child),
+      );
+    },
+  );
+}
