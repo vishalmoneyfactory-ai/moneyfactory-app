@@ -417,7 +417,9 @@ $link
     return SliverAppBar(
       floating: true,
       snap: true,
-      backgroundColor: AppColors.bg(context).withValues(alpha: .86),
+      backgroundColor: AppColors.isDark(context) 
+          ? AppColors.bg(context).withValues(alpha: .86)
+          : AppColors.card(context),
       surfaceTintColor: Colors.transparent,
       title: Text(
         'Profile',
