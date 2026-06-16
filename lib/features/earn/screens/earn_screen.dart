@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dio/dio.dart';
@@ -16,12 +18,62 @@ class EarnScreen extends StatefulWidget {
 }
 
 class _EarnScreenState extends State<EarnScreen> {
-  static const _assetVideoPath = 'assets/videos/earn_explainer.mp4';
+  static const _assetVideoPath = 'assets/videos/earn_explain.mp4';
 
   late Future<Map<String, dynamic>> _userFuture;
   VideoPlayerController? _controller;
   bool _loadingVideo = false;
   String? _videoError;
+  bool _showControls = true;
+  Timer? _hideTimer;
+
+  void _toggleControls() {
+    setState(() => _showControls = !_showControls);
+    _hideTimer?.cancel();
+    if (_showControls && _controller?.value.isPlaying == true) {
+      _hideTimer = Timer(const Duration(seconds: 3), () {
+        if (mounted && _controller?.value.isPlaying == true) {
+          setState(() => _showControls = false);
+        }
+      });
+    }
+  }
+
+  void _togglePlay() {
+    final controller = _controller;
+    if (controller == null) return;
+    if (controller.value.isPlaying) {
+      controller.pause();
+      setState(() => _showControls = true);
+      _hideTimer?.cancel();
+    } else {
+      controller.play();
+      setState(() => _showControls = false);
+      _hideTimer?.cancel();
+    }
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    return duration.inHours > 0 ? '${duration.inHours}:$minutes:$seconds' : '$minutes:$seconds';
+  }
+
+  void _seekBy(int seconds) {
+    final controller = _controller;
+    if (controller == null || !controller.value.isInitialized) return;
+    final targetMs = controller.value.position.inMilliseconds + (seconds * 1000);
+    final maxMs = controller.value.duration.inMilliseconds;
+    controller.seekTo(Duration(milliseconds: targetMs.clamp(0, maxMs).toInt()));
+    setState(() => _showControls = true);
+    _hideTimer?.cancel();
+    if (controller.value.isPlaying) {
+      _hideTimer = Timer(const Duration(seconds: 3), () {
+        if (mounted) setState(() => _showControls = false);
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -31,6 +83,7 @@ class _EarnScreenState extends State<EarnScreen> {
 
   @override
   void dispose() {
+    _hideTimer?.cancel();
     _controller?.dispose();
     super.dispose();
   }
@@ -78,7 +131,10 @@ class _EarnScreenState extends State<EarnScreen> {
       await controller.dispose();
       return;
     }
-    setState(() => _controller = controller);
+    setState(() {
+      _controller = controller;
+      _showControls = false;
+    });
   }
 
   Future<bool> _tryAssetVideo() async {
@@ -231,7 +287,10 @@ Earn with Money Factory.
               children: [
                 ColoredBox(color: AppColors.surface(context)),
                 if (controller?.value.isInitialized == true)
-                  VideoPlayer(controller!)
+                  GestureDetector(
+                    onTap: _toggleControls,
+                    child: VideoPlayer(controller!),
+                  )
                 else
                   DecoratedBox(
                     decoration: BoxDecoration(
@@ -257,46 +316,152 @@ Earn with Money Factory.
                       ),
                     ),
                   ),
-                Positioned.fill(
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: _loadingVideo ? null : _playEarnVideo,
-                      child: Center(
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 220),
-                          width: 74,
-                          height: 74,
+                if (controller?.value.isInitialized == true)
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      ignoring: !_showControls,
+                      child: AnimatedOpacity(
+                        opacity: _showControls ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 300),
+                        child: DecoratedBox(
                           decoration: BoxDecoration(
-                            color: AppColors.gold.withValues(alpha: .92),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.gold.withValues(alpha: .35),
-                                blurRadius: 28,
+                            color: Colors.black.withValues(alpha: .4),
+                          ),
+                          child: Stack(
+                            children: [
+                              Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IconButton(
+                                      iconSize: 42,
+                                      color: AppColors.gold,
+                                      icon: const Icon(Icons.replay_10),
+                                      onPressed: () => _seekBy(-10),
+                                    ),
+                                    const SizedBox(width: 24),
+                                    InkWell(
+                                      onTap: _togglePlay,
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 220),
+                                        width: 74,
+                                        height: 74,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.gold.withValues(alpha: .92),
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppColors.gold.withValues(alpha: .35),
+                                              blurRadius: 28,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Icon(
+                                          controller!.value.isPlaying
+                                              ? Icons.pause
+                                              : Icons.play_arrow,
+                                          color: AppColors.primaryBg,
+                                          size: 42,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 24),
+                                    IconButton(
+                                      iconSize: 42,
+                                      color: AppColors.gold,
+                                      icon: const Icon(Icons.forward_10),
+                                      onPressed: () => _seekBy(10),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Positioned(
+                                left: 16,
+                                right: 16,
+                                bottom: 12,
+                                child: ValueListenableBuilder<VideoPlayerValue>(
+                                  valueListenable: controller,
+                                  builder: (context, value, child) {
+                                    return Row(
+                                      children: [
+                                        Text(
+                                          _formatDuration(value.position),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: VideoProgressIndicator(
+                                            controller,
+                                            allowScrubbing: true,
+                                            colors: const VideoProgressColors(
+                                              playedColor: AppColors.gold,
+                                              bufferedColor: Colors.white24,
+                                              backgroundColor: Colors.white12,
+                                            ),
+                                            padding: const EdgeInsets.symmetric(vertical: 12),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          _formatDuration(value.duration),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
                               ),
                             ],
                           ),
-                          child: _loadingVideo
-                              ? const Padding(
-                                  padding: EdgeInsets.all(22),
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 3,
-                                    color: AppColors.primaryBg,
-                                  ),
-                                )
-                              : Icon(
-                                  controller?.value.isPlaying == true
-                                      ? Icons.pause
-                                      : Icons.play_arrow,
-                                  color: AppColors.primaryBg,
-                                  size: 42,
+                        ),
+                      ),
+                    ),
+                  )
+                else if (_loadingVideo)
+                  const Positioned.fill(
+                    child: Center(
+                      child: CircularProgressIndicator(color: AppColors.gold),
+                    ),
+                  )
+                else
+                  Positioned.fill(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: _playEarnVideo,
+                        child: Center(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 220),
+                            width: 74,
+                            height: 74,
+                            decoration: BoxDecoration(
+                              color: AppColors.gold.withValues(alpha: .92),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.gold.withValues(alpha: .35),
+                                  blurRadius: 28,
                                 ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.play_arrow,
+                              color: AppColors.primaryBg,
+                              size: 42,
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
