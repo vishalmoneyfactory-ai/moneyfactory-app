@@ -6,6 +6,7 @@ import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/splash_screen.dart';
 import '../../features/courses/screens/course_detail_screen.dart';
 import '../../features/courses/screens/my_courses_screen.dart';
+import '../../features/earn/screens/earn_screen.dart';
 import '../../features/home/screens/home_screen.dart';
 import '../../features/payment/screens/checkout_screen.dart';
 import '../../features/profile/screens/complete_profile_screen.dart';
@@ -38,6 +39,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/learning',
             pageBuilder: (context, state) =>
                 _page(state, const MyCoursesScreen()),
+          ),
+          GoRoute(
+            path: '/earn',
+            pageBuilder: (context, state) => _page(state, const EarnScreen()),
           ),
           GoRoute(
             path: '/profile',

@@ -14,7 +14,8 @@ class AppShell extends StatelessWidget {
     final location = GoRouterState.of(context).uri.path;
     int index = 0;
     if (location.startsWith('/learning')) index = 1;
-    if (location.startsWith('/profile')) index = 2;
+    if (location.startsWith('/earn')) index = 2;
+    if (location.startsWith('/profile')) index = 3;
 
     return PopScope(
       // Intercept the Android back button at the shell level
@@ -36,7 +37,8 @@ class AppShell extends StatelessWidget {
           onDestinationSelected: (value) {
             if (value == 0) context.go('/home');
             if (value == 1) context.go('/learning');
-            if (value == 2) context.go('/profile');
+            if (value == 2) context.go('/earn');
+            if (value == 3) context.go('/profile');
           },
           backgroundColor: AppColors.card(context),
           indicatorColor: AppColors.goldGlow,
@@ -50,6 +52,11 @@ class AppShell extends StatelessWidget {
               icon: Icon(Icons.school_outlined),
               selectedIcon: Icon(Icons.school),
               label: 'Courses',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.account_balance_wallet_outlined),
+              selectedIcon: Icon(Icons.account_balance_wallet),
+              label: 'Earn',
             ),
             NavigationDestination(
               icon: Icon(Icons.person_outline),

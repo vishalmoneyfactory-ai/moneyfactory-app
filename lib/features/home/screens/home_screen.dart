@@ -79,7 +79,9 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: BoxDecoration(
               gradient: AppColors.pageGradient(context),
               border: Border(
-                top: BorderSide(color: AppColors.themeGold(context).withValues(alpha: .32)),
+                top: BorderSide(
+                  color: AppColors.themeGold(context).withValues(alpha: .32),
+                ),
               ),
             ),
             child: SafeArea(
@@ -298,7 +300,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(99),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.themeGold(context).withValues(alpha: .12),
+                      color: AppColors.themeGold(
+                        context,
+                      ).withValues(alpha: .12),
                       blurRadius: 14,
                     ),
                   ],
@@ -546,7 +550,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            Icon(Icons.north_east, color: AppColors.themeGold(context), size: 18),
+            Icon(
+              Icons.north_east,
+              color: AppColors.themeGold(context),
+              size: 18,
+            ),
           ],
         ),
       ),
@@ -688,18 +696,20 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               children: List.generate(5, (star) {
                 final value = star + 1;
-                if (rating >= value)
+                if (rating >= value) {
                   return Icon(
                     Icons.star,
                     color: AppColors.themeGold(context),
                     size: 18,
                   );
-                if (rating > star)
+                }
+                if (rating > star) {
                   return Icon(
                     Icons.star_half,
                     color: AppColors.themeGold(context),
                     size: 18,
                   );
+                }
                 return Icon(
                   Icons.star_border,
                   color: AppColors.mutedText(context),

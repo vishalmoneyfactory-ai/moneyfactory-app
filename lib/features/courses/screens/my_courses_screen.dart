@@ -207,7 +207,9 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
           icon: Icon(
             _showFavoritesOnly ? Icons.favorite : Icons.favorite_border,
           ),
-          color: _showFavoritesOnly ? AppColors.error : AppColors.themeGold(context),
+          color: _showFavoritesOnly
+              ? AppColors.error
+              : AppColors.themeGold(context),
           tooltip: 'Favorite courses',
         ),
         const SizedBox(width: 8),
@@ -440,14 +442,12 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
             style: TextStyle(color: AppColors.mutedText(context), height: 1.45),
           ),
           const SizedBox(height: 14),
+          _priceDisplay(course),
+          const SizedBox(height: 14),
           Wrap(
             spacing: 18,
             runSpacing: 8,
             children: [
-              _inlineMeta(
-                isFree ? 'FREE' : _priceText(course),
-                isFree ? AppColors.success : AppColors.themeGold(context),
-              ),
               _inlineMeta(
                 '${course['totalVideos'] ?? 0} lessons',
                 AppColors.neonBlue,
@@ -466,7 +466,9 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                 child: Text(
                   _validityLabel(course['access']),
                   style: TextStyle(
-                    color: expired ? AppColors.error : AppColors.mutedText(context),
+                    color: expired
+                        ? AppColors.error
+                        : AppColors.mutedText(context),
                     fontWeight: expired ? FontWeight.w800 : FontWeight.w600,
                   ),
                 ),
@@ -548,6 +550,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
     final bundle = data['bundle'];
     final courses = data['courses'] as List<dynamic>? ?? [];
     if (bundle == null) return const SizedBox.shrink();
+    final thumbnail = api.mediaUrl(bundle['thumbnail'] as String?);
     return Container(
       margin: const EdgeInsets.only(top: 8, bottom: 24),
       padding: const EdgeInsets.all(24),
@@ -569,7 +572,9 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
             offset: const Offset(0, 16),
           ),
         ],
-        border: Border.all(color: AppColors.themeGold(context).withValues(alpha: .3)),
+        border: Border.all(
+          color: AppColors.themeGold(context).withValues(alpha: .3),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -582,7 +587,11 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                   color: AppColors.themeGold(context).withValues(alpha: .2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.stars_rounded, color: AppColors.gold, size: 24),
+                child: const Icon(
+                  Icons.stars_rounded,
+                  color: AppColors.gold,
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 12),
               Text(
@@ -597,8 +606,16 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
             ],
           ),
           const SizedBox(height: 16),
+          if (thumbnail.isNotEmpty) ...[
+            SizedBox(
+              height: 190,
+              width: double.infinity,
+              child: _courseImage(thumbnail, radius: 24),
+            ),
+            const SizedBox(height: 20),
+          ],
           Text(
-            'Complete Trading Mastery Bundle',
+            bundle['title'] ?? 'Complete Trading Mastery Bundle',
             style: TextStyle(
               color: AppColors.text(context),
               fontSize: 30,
@@ -623,32 +640,26 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
           const SizedBox(height: 24),
           Row(
             children: [
-              Expanded(
-                child: Text(
-                  money(data['bundlePrice'] ?? bundle['price'] ?? 4999),
-                  style: TextStyle(
-                    color: AppColors.themeGold(context),
-                    fontFamily: 'JetBrains Mono',
-                    fontSize: 34,
-                    fontWeight: FontWeight.w900,
+              Expanded(child: _priceDisplay(bundle, large: true)),
+              if (_asNum(data['savings']) > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withValues(alpha: .15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${_percentOff(data['savings'], data['individualTotal'])}% OFF bundle',
+                    style: const TextStyle(
+                      color: AppColors.success,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.success.withValues(alpha: .15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'Save ${money(data['savings'] ?? 0)}',
-                  style: const TextStyle(
-                    color: AppColors.success,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -840,12 +851,16 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
           ? ColoredBox(
               color: AppColors.surface(context),
               child: Center(
-                child: Icon(Icons.show_chart, color: AppColors.themeGold(context), size: 42),
+                child: Icon(
+                  Icons.show_chart,
+                  color: AppColors.themeGold(context),
+                  size: 42,
+                ),
               ),
             )
           : CachedNetworkImage(
               imageUrl: url,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
               width: double.infinity,
               errorWidget: (_, _, _) => ColoredBox(
                 color: AppColors.surface(context),
@@ -880,6 +895,95 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
     ],
   );
 
+  Widget _priceDisplay(dynamic course, {bool large = false}) {
+    if (course['isFree'] == true) {
+      return Text(
+        'FREE',
+        style: TextStyle(
+          color: AppColors.success,
+          fontFamily: 'JetBrains Mono',
+          fontSize: large ? 34 : 24,
+          fontWeight: FontWeight.w900,
+        ),
+      );
+    }
+
+    final original = _asNum(course['originalPrice'] ?? course['price']);
+    final effective = _asNum(
+      course['effectivePrice'] ??
+          course['bundlePrice'] ??
+          course['price'] ??
+          original,
+    );
+    final discount = _asNum(course['offerDiscount'] ?? (original - effective));
+    final percent = _asNum(
+      course['offerPercent'] ?? _percentOff(discount, original),
+    );
+    final hasOffer = course['hasOffer'] == true && discount > 0;
+
+    if (!hasOffer) {
+      return Text(
+        money(effective),
+        style: TextStyle(
+          color: AppColors.themeGold(context),
+          fontFamily: 'JetBrains Mono',
+          fontSize: large ? 34 : 24,
+          fontWeight: FontWeight.w900,
+        ),
+      );
+    }
+
+    return Wrap(
+      spacing: 10,
+      runSpacing: 8,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text(
+          money(effective),
+          style: TextStyle(
+            color: AppColors.themeGold(context),
+            fontFamily: 'JetBrains Mono',
+            fontSize: large ? 34 : 25,
+            height: 1,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        Text(
+          money(original),
+          style: TextStyle(
+            color: AppColors.mutedText(context),
+            fontFamily: 'JetBrains Mono',
+            decoration: TextDecoration.lineThrough,
+            decorationColor: AppColors.mutedText(context),
+            fontSize: large ? 16 : 14,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.success.withValues(alpha: .15),
+            borderRadius: BorderRadius.circular(99),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.success.withValues(alpha: .10),
+                blurRadius: 18,
+              ),
+            ],
+          ),
+          child: Text(
+            '${percent.round()}% OFF',
+            style: const TextStyle(
+              color: AppColors.success,
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _chip(String label) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     decoration: BoxDecoration(
@@ -912,9 +1016,6 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
     ),
   );
 
-  String _priceText(dynamic course) =>
-      money(course['effectivePrice'] ?? course['price'] ?? 0);
-
   String _validityLabel(dynamic access) {
     if (access == null || access['isOwned'] != true) {
       return '30 days validity after purchase';
@@ -942,4 +1043,10 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
 
   num _asNum(dynamic value) =>
       value is num ? value : num.tryParse(value?.toString() ?? '') ?? 0;
+
+  int _percentOff(dynamic discount, dynamic original) {
+    final base = _asNum(original);
+    if (base <= 0) return 0;
+    return ((_asNum(discount) / base) * 100).round().clamp(0, 99);
+  }
 }

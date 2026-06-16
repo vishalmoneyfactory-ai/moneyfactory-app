@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import '../../../core/api/api_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
-import '../../../shared/widgets/gold_button.dart';
 import '../../../shared/widgets/motion.dart';
 
 class CourseDetailScreen extends StatelessWidget {
@@ -134,7 +133,9 @@ class CourseDetailScreen extends StatelessWidget {
                           const SizedBox(height: 16),
                           ...videos.asMap().entries.map(
                             (entry) => FadeSlideIn(
-                              delay: Duration(milliseconds: 300 + (entry.key * 60)),
+                              delay: Duration(
+                                milliseconds: 300 + (entry.key * 60),
+                              ),
                               child: _videoTile(
                                 context,
                                 entry.value,
@@ -185,11 +186,18 @@ class CourseDetailScreen extends StatelessWidget {
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
                       child: Container(
-                        padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(context).padding.bottom + 16),
+                        padding: EdgeInsets.fromLTRB(
+                          20,
+                          16,
+                          20,
+                          MediaQuery.of(context).padding.bottom + 16,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.bg(context).withValues(alpha: .7),
                           border: Border(
-                            top: BorderSide(color: AppColors.gold.withValues(alpha: .2)),
+                            top: BorderSide(
+                              color: AppColors.gold.withValues(alpha: .2),
+                            ),
                           ),
                         ),
                         child: Row(
@@ -200,7 +208,14 @@ class CourseDetailScreen extends StatelessWidget {
                             ),
                             Expanded(
                               flex: 5,
-                              child: _actionButton(context, course, courseId, owned, isFree, expired),
+                              child: _actionButton(
+                                context,
+                                course,
+                                courseId,
+                                owned,
+                                isFree,
+                                expired,
+                              ),
                             ),
                           ],
                         ),
@@ -280,7 +295,7 @@ class CourseDetailScreen extends StatelessWidget {
                 )
               : CachedNetworkImage(
                   imageUrl: thumbnail,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                   alignment: Alignment.center,
                 ),
         ),
@@ -319,13 +334,20 @@ class CourseDetailScreen extends StatelessWidget {
                       color: AppColors.success.withValues(alpha: .15),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.check, size: 14, color: AppColors.success),
+                    child: const Icon(
+                      Icons.check,
+                      size: 14,
+                      color: AppColors.success,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       o.toString(),
-                      style: TextStyle(color: AppColors.text(context), height: 1.4),
+                      style: TextStyle(
+                        color: AppColors.text(context),
+                        height: 1.4,
+                      ),
                     ),
                   ),
                 ],
@@ -382,7 +404,9 @@ class CourseDetailScreen extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.w800,
             fontSize: 15,
-            color: canPlay ? AppColors.text(context) : AppColors.mutedText(context),
+            color: canPlay
+                ? AppColors.text(context)
+                : AppColors.mutedText(context),
           ),
         ),
         subtitle: Padding(
@@ -433,23 +457,29 @@ class CourseDetailScreen extends StatelessWidget {
       height: 54,
       child: FilledButton.icon(
         icon: Icon(
-          owned ? Icons.play_arrow : isFree ? Icons.lock_open : Icons.shopping_cart,
+          owned
+              ? Icons.play_arrow
+              : isFree
+              ? Icons.lock_open
+              : Icons.shopping_cart,
           size: 20,
         ),
         label: Text(
           owned
               ? 'Start Learning'
               : expired
-                  ? 'Repurchase'
-                  : isFree
-                      ? 'Unlock Free'
-                      : 'Buy Now',
+              ? 'Repurchase'
+              : isFree
+              ? 'Unlock Free'
+              : 'Buy Now',
           style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
         ),
         style: FilledButton.styleFrom(
           backgroundColor: owned ? AppColors.success : AppColors.gold,
           foregroundColor: AppColors.primaryBg,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
         onPressed: () async {
           if (owned) {
@@ -527,13 +557,15 @@ class CourseDetailScreen extends StatelessWidget {
         ),
       );
     }
+    final original = _asNum(course['originalPrice'] ?? course['price']);
+    final effective = _asNum(course['effectivePrice'] ?? course['price']);
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,
       spacing: 8,
       runSpacing: 4,
       children: [
         Text(
-          money(course['effectivePrice'] ?? course['price'] ?? 0),
+          money(effective),
           style: TextStyle(
             color: AppColors.gold,
             fontFamily: 'JetBrains Mono',
@@ -543,7 +575,7 @@ class CourseDetailScreen extends StatelessWidget {
           ),
         ),
         Text(
-          money(course['originalPrice'] ?? course['price'] ?? 0),
+          money(original),
           style: TextStyle(
             color: AppColors.mutedText(context),
             fontFamily: 'JetBrains Mono',
@@ -634,4 +666,7 @@ class CourseDetailScreen extends StatelessWidget {
       ),
     ),
   );
+
+  num _asNum(dynamic value) =>
+      value is num ? value : num.tryParse(value?.toString() ?? '') ?? 0;
 }
