@@ -141,7 +141,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                 slivers: [
                   _floatingAppBar(),
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 34),
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
                     sliver: SliverList.list(
                       children: [
                         FadeSlideIn(

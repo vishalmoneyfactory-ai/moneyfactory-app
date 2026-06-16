@@ -239,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 slivers: [
                   _floatingAppBar(user),
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 34),
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 120),
                     sliver: SliverList.list(
                       children: [
                         FadeSlideIn(child: _hero(user)),

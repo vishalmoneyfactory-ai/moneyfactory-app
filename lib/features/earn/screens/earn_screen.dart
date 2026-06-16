@@ -229,7 +229,7 @@ Earn with Money Factory.
               final referrals = user['totalReferrals'] as num? ?? 0;
 
               return ListView(
-                padding: const EdgeInsets.fromLTRB(20, 74, 20, 34),
+                padding: const EdgeInsets.fromLTRB(20, 74, 20, 120),
                 children: [
                   FadeSlideIn(child: _videoHero()),
                   const SizedBox(height: 32),
@@ -259,21 +259,17 @@ Earn with Money Factory.
   Widget _videoHero() {
     final controller = _controller;
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           'Promote & Earn',
+          textAlign: TextAlign.center,
           style: TextStyle(
             color: AppColors.themeGold(context),
             fontSize: 42,
-            height: .96,
+            height: 1,
             fontWeight: FontWeight.w900,
           ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'Watch the owner explain the referral process, then share your code directly from here.',
-          style: TextStyle(color: AppColors.mutedText(context), height: 1.5),
         ),
         const SizedBox(height: 22),
         AspectRatio(
