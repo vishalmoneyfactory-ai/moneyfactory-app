@@ -210,16 +210,23 @@ Earn with Money Factory.
             future: _userFuture,
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 74, 20, 32),
-                  children: const [
-                    ShimmerLine(height: 220, radius: 28),
-                    SizedBox(height: 28),
-                    ShimmerLine(width: 240, height: 34),
-                    SizedBox(height: 14),
-                    ShimmerLine(height: 20),
-                    SizedBox(height: 10),
-                    ShimmerLine(height: 20),
+                return CustomScrollView(
+                  slivers: [
+                    _floatingAppBar(),
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+                      sliver: SliverList.list(
+                        children: const [
+                          ShimmerLine(height: 220, radius: 28),
+                          SizedBox(height: 28),
+                          ShimmerLine(width: 240, height: 34),
+                          SizedBox(height: 14),
+                          ShimmerLine(height: 20),
+                          SizedBox(height: 10),
+                          ShimmerLine(height: 20),
+                        ],
+                      ),
+                    ),
                   ],
                 );
               }
@@ -228,24 +235,31 @@ Earn with Money Factory.
               final wallet = user['walletBalance'] as num? ?? 0;
               final referrals = user['totalReferrals'] as num? ?? 0;
 
-              return ListView(
-                padding: const EdgeInsets.fromLTRB(20, 74, 20, 120),
-                children: [
-                  FadeSlideIn(child: _videoHero()),
-                  const SizedBox(height: 32),
-                  FadeSlideIn(
-                    delay: const Duration(milliseconds: 90),
-                    child: _programInfo(),
-                  ),
-                  const SizedBox(height: 30),
-                  FadeSlideIn(
-                    delay: const Duration(milliseconds: 150),
-                    child: _wallet(wallet, referrals),
-                  ),
-                  const SizedBox(height: 26),
-                  FadeSlideIn(
-                    delay: const Duration(milliseconds: 210),
-                    child: _referralTools(code),
+              return CustomScrollView(
+                slivers: [
+                  _floatingAppBar(),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 120),
+                    sliver: SliverList.list(
+                      children: [
+                        FadeSlideIn(child: _videoHero()),
+                        const SizedBox(height: 32),
+                        FadeSlideIn(
+                          delay: const Duration(milliseconds: 90),
+                          child: _programInfo(),
+                        ),
+                        const SizedBox(height: 30),
+                        FadeSlideIn(
+                          delay: const Duration(milliseconds: 150),
+                          child: _wallet(wallet, referrals),
+                        ),
+                        const SizedBox(height: 26),
+                        FadeSlideIn(
+                          delay: const Duration(milliseconds: 210),
+                          child: _referralTools(code),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               );
@@ -261,17 +275,6 @@ Earn with Money Factory.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(
-          'Promote & Earn',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: AppColors.themeGold(context),
-            fontSize: 42,
-            height: 1,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-        const SizedBox(height: 22),
         AspectRatio(
           aspectRatio: controller?.value.isInitialized == true
               ? controller!.value.aspectRatio
@@ -623,4 +626,22 @@ Earn with Money Factory.
       ),
     ),
   );
+
+  SliverAppBar _floatingAppBar() {
+    return SliverAppBar(
+      floating: true,
+      snap: true,
+      backgroundColor: AppColors.isDark(context) 
+          ? AppColors.bg(context).withValues(alpha: .86)
+          : AppColors.card(context),
+      surfaceTintColor: Colors.transparent,
+      title: Text(
+        'Promote & Earn',
+        style: TextStyle(
+          color: AppColors.text(context),
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
+  }
 }
