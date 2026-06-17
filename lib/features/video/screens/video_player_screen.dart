@@ -61,10 +61,24 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         _progress = progress;
       });
     }
-    await _buildPlayer(stream['sources']['url720'] ?? stream['sources']['url480'] ?? '');
+
+    final localProgress = Hive.box('progress').get(widget.videoId);
+    final remoteProgress = progress.cast<dynamic>().where((row) => row['video']?['_id'] == widget.videoId || row['video'] == widget.videoId || row['videoId'] == widget.videoId).firstOrNull;
+    final target = localProgress ?? remoteProgress;
+    
+    int startPos = 0;
+    if (target != null) {
+      final watched = (target['watchedSeconds'] ?? 0) as num;
+      final total = (target['totalSeconds'] ?? 0) as num;
+      if (watched > 0 && watched < total - 5) {
+        startPos = watched.toInt();
+      }
+    }
+
+    await _buildPlayer(stream['sources']['url1080'] ?? stream['sources']['url720'] ?? stream['sources']['url480'] ?? '', startPosition: Duration(seconds: startPos));
   }
 
-  Future<void> _buildPlayer(String url) async {
+  Future<void> _buildPlayer(String url, {Duration? startPosition}) async {
     if (url.isEmpty) return;
     _localTimer?.cancel();
     _remoteTimer?.cancel();
@@ -75,6 +89,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     );
     await controller.initialize();
     await controller.setPlaybackSpeed(_speed);
+    if (startPosition != null && startPosition.inSeconds > 0) {
+      await controller.seekTo(startPosition);
+    }
     await controller.play();
     controller.addListener(() {
       if (mounted) setState(() {});
@@ -152,10 +169,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     final previousPosition = _controller?.value.position ?? Duration.zero;
     final wasPlaying = _controller?.value.isPlaying ?? true;
     setState(() => _quality = quality);
-    final source = quality == '480p' ? _stream!['sources']['url480'] : _stream!['sources']['url720'];
+    final source = quality == '1080p' ? _stream!['sources']['url1080'] : quality == '480p' ? _stream!['sources']['url480'] : _stream!['sources']['url720'];
     if (mounted) Navigator.pop(context);
-    await _buildPlayer(source);
-    await _controller?.seekTo(previousPosition);
+    await _buildPlayer(source ?? '', startPosition: previousPosition);
     if (!wasPlaying) await _controller?.pause();
     if (mounted) setState(() => _playing = _controller?.value.isPlaying ?? false);
   }
@@ -376,7 +392,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           Text('Quality', style: TextStyle(color: AppColors.mutedText(context), fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
           Row(
-            children: ['480p', '720p'].map((q) => Padding(
+            children: ['480p', '720p', '1080p'].map((q) => Padding(
               padding: const EdgeInsets.only(right: 12),
               child: ChoiceChip(
                 label: Text(q, style: TextStyle(fontWeight: FontWeight.w600, color: _quality == q ? AppColors.primaryBg : AppColors.text(context))),
