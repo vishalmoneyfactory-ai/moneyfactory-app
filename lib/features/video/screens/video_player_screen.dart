@@ -28,7 +28,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Timer? _localTimer;
   Timer? _remoteTimer;
   Timer? _hideTimer;
-  String _quality = '720p';
+  String _quality = 'Auto';
   double _speed = 1.0;
   bool _playing = true;
   bool _showControls = true;
@@ -79,7 +79,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       }
     }
 
-    await _buildPlayer(stream['sources']['url1080'] ?? stream['sources']['url720'] ?? stream['sources']['url480'] ?? '', startPosition: Duration(seconds: startPos));
+    await _buildPlayer(stream['sources']['urlAuto'] ?? stream['sources']['url1080'] ?? stream['sources']['url720'] ?? stream['sources']['url480'] ?? '', startPosition: Duration(seconds: startPos));
   }
 
   Future<void> _buildPlayer(String url, {Duration? startPosition}) async {
@@ -173,7 +173,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     final previousPosition = _controller?.value.position ?? Duration.zero;
     final wasPlaying = _controller?.value.isPlaying ?? true;
     setState(() => _quality = quality);
-    final source = quality == '1080p' ? _stream!['sources']['url1080'] : quality == '480p' ? _stream!['sources']['url480'] : _stream!['sources']['url720'];
+    final source = quality == 'Auto' ? _stream!['sources']['urlAuto'] : quality == '1080p' ? _stream!['sources']['url1080'] : quality == '480p' ? _stream!['sources']['url480'] : _stream!['sources']['url720'];
     if (mounted) Navigator.pop(context);
     await _buildPlayer(source ?? '', startPosition: previousPosition);
     if (!wasPlaying) await _controller?.pause();
@@ -431,7 +431,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           Text('Quality', style: TextStyle(color: AppColors.mutedText(context), fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
           Row(
-            children: ['480p', '720p', '1080p'].map((q) => Padding(
+            children: ['Auto', '480p', '720p', '1080p'].map((q) => Padding(
               padding: const EdgeInsets.only(right: 12),
               child: ChoiceChip(
                 label: Text(q, style: TextStyle(fontWeight: FontWeight.w600, color: _quality == q ? AppColors.primaryBg : AppColors.text(context))),
