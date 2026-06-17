@@ -60,7 +60,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString()),
+            content: Text(parseError(e)),
             backgroundColor: AppColors.error,
           ),
         );
@@ -87,7 +87,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 130, 20, 30),
                   child: Center(
                     child: Text(
-                      snapshot.error.toString(),
+                      parseError(snapshot.error!),
                       textAlign: TextAlign.center,
                     ),
                   ),

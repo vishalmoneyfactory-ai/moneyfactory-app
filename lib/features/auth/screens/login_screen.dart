@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/api/dio_client.dart';
 import '../../../core/auth/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/gold_button.dart';
 import '../../../shared/widgets/motion.dart';
 
@@ -32,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error),
+          SnackBar(content: Text(parseError(e)), backgroundColor: AppColors.error),
         );
       }
     } finally {

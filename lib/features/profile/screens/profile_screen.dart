@@ -12,6 +12,7 @@ import '../../../core/api/api_service.dart';
 import '../../../core/api/dio_client.dart';
 import '../../../core/auth/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/motion.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -80,7 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString()),
+            content: Text(parseError(e)),
             backgroundColor: AppColors.error,
           ),
         );

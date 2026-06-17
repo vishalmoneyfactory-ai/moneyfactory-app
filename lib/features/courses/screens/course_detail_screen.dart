@@ -502,7 +502,7 @@ class CourseDetailScreen extends StatelessWidget {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(e.toString()),
+                    content: Text(parseError(e)),
                     backgroundColor: AppColors.error,
                   ),
                 );
@@ -518,7 +518,7 @@ class CourseDetailScreen extends StatelessWidget {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(e.toString()),
+                    content: Text(parseError(e)),
                     backgroundColor: AppColors.error,
                   ),
                 );

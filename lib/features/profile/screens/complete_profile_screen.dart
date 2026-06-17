@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/api/api_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/gold_button.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
@@ -44,7 +45,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString()),
+            content: Text(parseError(e)),
             backgroundColor: AppColors.error,
           ),
         );
