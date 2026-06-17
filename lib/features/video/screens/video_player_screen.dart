@@ -59,7 +59,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     _localTimer?.cancel();
     _remoteTimer?.cancel();
     await _controller?.dispose();
-    final controller = VideoPlayerController.networkUrl(Uri.parse(url));
+    final controller = VideoPlayerController.networkUrl(
+      Uri.parse(url),
+      httpHeaders: {'Referer': 'https://moneyfactory.app/'},
+    );
     await controller.initialize();
     await controller.setPlaybackSpeed(_speed);
     await controller.play();
