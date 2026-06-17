@@ -22,6 +22,7 @@ class VideoPlayerScreen extends StatefulWidget {
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   VideoPlayerController? _controller;
   Map<String, dynamic>? _stream;
+  Map<String, dynamic>? _course;
   List<dynamic> _videos = [];
   List<dynamic> _progress = [];
   Timer? _localTimer;
@@ -54,11 +55,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     final stream = await api.streamUrl(widget.videoId);
     final videos = widget.courseId.isEmpty ? <dynamic>[] : await api.courseVideos(widget.courseId);
     final progress = widget.courseId.isEmpty ? <dynamic>[] : await api.progressCourse(widget.courseId);
+    final courseData = widget.courseId.isEmpty ? null : await api.course(widget.courseId);
+    
     if (mounted) {
       setState(() {
         _stream = stream;
         _videos = videos;
         _progress = progress;
+        _course = courseData?['course'];
       });
     }
 
@@ -230,45 +234,80 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(current?['title'] ?? 'Video', style: const TextStyle(fontWeight: FontWeight.w800)),
-        backgroundColor: AppColors.isDark(context) ? AppColors.bg(context) : AppColors.card(context),
+        backgroundColor: AppColors.isDark(context) ? AppColors.bg(context).withValues(alpha: .86) : AppColors.card(context),
         surfaceTintColor: Colors.transparent,
       ),
-      body: _controller == null || !_controller!.value.isInitialized
-          ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _player(isFullScreen: false),
-                const SizedBox(height: 16),
-                Text(
-                  current?['title'] ?? _stream?['video']?['title'] ?? '',
-                  style: TextStyle(color: AppColors.text(context), fontSize: 22, fontWeight: FontWeight.w900),
-                ),
-                const SizedBox(height: 12),
-                LinearProgressIndicator(value: _completion(widget.videoId), backgroundColor: AppColors.line(context), color: AppColors.gold),
-                const SizedBox(height: 24),
-                Text('Course Content', style: TextStyle(color: AppColors.text(context), fontSize: 18, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 12),
-                ..._videos.map((v) {
-                  final active = v['_id'] == widget.videoId;
-                  final done = _completion(v['_id']) >= .9;
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    decoration: BoxDecoration(
-                      color: AppColors.card(context),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: active ? AppColors.gold : AppColors.line(context)),
+      body: Container(
+        decoration: BoxDecoration(gradient: AppColors.pageGradient(context)),
+        child: _controller == null || !_controller!.value.isInitialized
+            ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+            : ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  _player(isFullScreen: false),
+                  const SizedBox(height: 16),
+                  Text(
+                    current?['title'] ?? _stream?['video']?['title'] ?? '',
+                    style: TextStyle(color: AppColors.text(context), fontSize: 22, fontWeight: FontWeight.w900),
+                  ),
+                  const SizedBox(height: 12),
+                  LinearProgressIndicator(value: _completion(widget.videoId), backgroundColor: AppColors.line(context), color: AppColors.gold),
+                  const SizedBox(height: 24),
+                  Text('Course Content', style: TextStyle(color: AppColors.text(context), fontSize: 18, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 12),
+                  ..._videos.map((v) {
+                    final active = v['_id'] == widget.videoId;
+                    final done = _completion(v['_id']) >= .9;
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      decoration: BoxDecoration(
+                        color: active ? AppColors.gold.withValues(alpha: .1) : AppColors.card(context),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: active ? AppColors.gold : AppColors.line(context)),
+                      ),
+                      child: ListTile(
+                        leading: Icon(done ? Icons.check_circle : Icons.play_circle_outline, color: done ? AppColors.success : AppColors.gold),
+                        title: Text(v['title'], style: TextStyle(color: AppColors.text(context), fontWeight: active ? FontWeight.w800 : FontWeight.w600)),
+                        subtitle: Text(durationLabel(v['duration'] ?? 0), style: TextStyle(color: AppColors.mutedText(context))),
+                      ),
+                    );
+                  }),
+                  
+                  if (_course != null) ...[
+                    const SizedBox(height: 40),
+                    Text('Detailed Description', style: TextStyle(color: AppColors.text(context), fontSize: 20, fontWeight: FontWeight.w900)),
+                    const SizedBox(height: 16),
+                    Text(
+                      _course!['description'] ?? _course!['shortDescription'] ?? '',
+                      style: TextStyle(color: AppColors.mutedText(context), height: 1.6, fontSize: 15),
                     ),
-                    child: ListTile(
-                      leading: Icon(done ? Icons.check_circle : Icons.play_circle_outline, color: done ? AppColors.success : AppColors.gold),
-                      title: Text(v['title'], style: TextStyle(color: AppColors.text(context), fontWeight: active ? FontWeight.w800 : FontWeight.w600)),
-                      subtitle: Text(durationLabel(v['duration'] ?? 0), style: TextStyle(color: AppColors.mutedText(context))),
-                    ),
-                  );
-                }),
-                const SizedBox(height: 40),
-              ],
-            ),
+                    
+                    if (_course!['outcomes'] != null && (_course!['outcomes'] as List).isNotEmpty) ...[
+                      const SizedBox(height: 32),
+                      Text('What you will learn', style: TextStyle(color: AppColors.text(context), fontSize: 20, fontWeight: FontWeight.w900)),
+                      const SizedBox(height: 16),
+                      ...(_course!['outcomes'] as List).map((outcome) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.check_circle, color: AppColors.success, size: 20),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                outcome.toString(),
+                                style: TextStyle(color: AppColors.text(context), height: 1.4, fontSize: 15),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                    ],
+                  ],
+                  const SizedBox(height: 40),
+                ],
+              ),
+      ),
     );
   }
 

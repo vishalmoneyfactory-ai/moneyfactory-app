@@ -713,7 +713,20 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
     final total = course['totalVideos'] == 0
         ? rows.length
         : course['totalVideos'];
-    final percent = total == 0 ? 0.0 : completed / total;
+        
+    double watchedSeconds = 0;
+    for (var p in rows) {
+      watchedSeconds += (p['watchedSeconds'] ?? 0);
+    }
+    final num totalSeconds = course['totalDuration'] ?? 0;
+    
+    double percent = 0.0;
+    if (totalSeconds > 0) {
+      percent = watchedSeconds / totalSeconds;
+    } else {
+      if (total > 0) percent = completed / total;
+    }
+    if (completed >= total && total > 0) percent = 1.0;
     final expired = course['isExpired'] == true;
     final thumbnail = api.mediaUrl(course['thumbnail'] as String?);
     return Padding(
@@ -779,7 +792,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
             padding: EdgeInsets.zero,
             barRadius: const Radius.circular(99),
             percent: percent.clamp(0, 1).toDouble(),
-            progressColor: AppColors.themeGold(context),
+            progressColor: percent >= 1.0 ? AppColors.success : AppColors.themeGold(context),
             backgroundColor: AppColors.line(context).withValues(alpha: .55),
           ),
           const SizedBox(height: 10),
