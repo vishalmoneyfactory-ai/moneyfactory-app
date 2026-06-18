@@ -18,7 +18,7 @@ class EarnScreen extends StatefulWidget {
 }
 
 class _EarnScreenState extends State<EarnScreen> {
-  static const _assetVideoPath = 'assets/videos/earn_explain.mp4';
+  static const _assetVideoPath = 'assets/videos/earn_explainer.mp4';
 
   late Future<Map<String, dynamic>> _userFuture;
   VideoPlayerController? _controller;
