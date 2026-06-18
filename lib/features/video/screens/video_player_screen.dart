@@ -108,6 +108,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
     _localTimer = Timer.periodic(const Duration(seconds: 10), (_) => _saveProgress(localOnly: true));
     _remoteTimer = Timer.periodic(const Duration(seconds: 30), (_) => _saveProgress());
+    _saveProgress(); // Initial sync
     _startHideTimer();
   }
 
