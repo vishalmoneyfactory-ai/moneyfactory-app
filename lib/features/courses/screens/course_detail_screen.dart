@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/api/api_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/course_content.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/motion.dart';
 
@@ -58,7 +59,7 @@ class CourseDetailScreen extends StatelessWidget {
             final expired = course['access']?['isExpired'] == true;
             final isFree = course['isFree'] == true;
             final thumbnail = api.mediaUrl(course['thumbnail'] as String?);
-            final outcomes = course['outcomes'] as List<dynamic>? ?? [];
+            final outcomes = CourseContent.getOutcomes(course['title'] ?? '', course['outcomes'] as List<dynamic>? ?? []);
 
             return Stack(
               children: [
@@ -100,7 +101,7 @@ class CourseDetailScreen extends StatelessWidget {
                           FadeSlideIn(
                             delay: const Duration(milliseconds: 180),
                             child: Text(
-                              course['shortDescription'] ?? '',
+                              CourseContent.getDescription(course['title'] ?? '', course['shortDescription'] ?? course['description'] ?? ''),
                               style: TextStyle(
                                 color: AppColors.mutedText(context),
                                 height: 1.6,

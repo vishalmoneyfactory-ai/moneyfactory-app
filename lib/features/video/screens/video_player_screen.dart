@@ -7,6 +7,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../../core/api/api_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/course_content.dart';
 import '../../../core/utils/formatters.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
@@ -279,15 +280,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     Text('Detailed Description', style: TextStyle(color: AppColors.text(context), fontSize: 20, fontWeight: FontWeight.w900)),
                     const SizedBox(height: 16),
                     Text(
-                      _course!['description'] ?? _course!['shortDescription'] ?? '',
+                      CourseContent.getDescription(_course!['title'] ?? '', _course!['description'] ?? _course!['shortDescription'] ?? ''),
                       style: TextStyle(color: AppColors.mutedText(context), height: 1.6, fontSize: 15),
                     ),
                     
-                    if (_course!['outcomes'] != null && (_course!['outcomes'] as List).isNotEmpty) ...[
+                    if (CourseContent.getOutcomes(_course!['title'] ?? '', _course!['outcomes'] as List? ?? []).isNotEmpty) ...[
                       const SizedBox(height: 32),
                       Text('What you will learn', style: TextStyle(color: AppColors.text(context), fontSize: 20, fontWeight: FontWeight.w900)),
                       const SizedBox(height: 16),
-                      ...(_course!['outcomes'] as List).map((outcome) => Padding(
+                      ...CourseContent.getOutcomes(_course!['title'] ?? '', _course!['outcomes'] as List? ?? []).map((outcome) => Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
