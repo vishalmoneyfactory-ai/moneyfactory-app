@@ -130,7 +130,16 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(height: 22),
           GoldButton(
             label: _loading ? 'Signing in...' : 'Login',
-            onPressed: _loading ? null : () => _run(() async => _auth.signInWithEmail(_email.text.trim(), _password.text)),
+            onPressed: _loading ? null : () => _run(() async {
+              final email = _email.text.trim();
+              if (email.isEmpty || !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email)) {
+                throw Exception('Please enter a valid email address');
+              }
+              if (_password.text.isEmpty) {
+                throw Exception('Please enter your password');
+              }
+              await _auth.signInWithEmail(email, _password.text);
+            }),
           ),
         ],
       );
@@ -153,9 +162,21 @@ class _LoginScreenState extends State<LoginScreen> {
             onPressed: _loading
                 ? null
                 : () => _run(() async {
+                    final name = _name.text.trim();
+                    final phone = _phone.text.trim();
+                    final email = _email.text.trim();
+                    
+                    if (name.length < 3) throw Exception('Please enter your full name (min 3 characters)');
+                    if (phone.isEmpty || !RegExp(r"^\+?[0-9]{10,15}$").hasMatch(phone)) {
+                      throw Exception('Please enter a valid 10-15 digit phone number');
+                    }
+                    if (email.isEmpty || !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email)) {
+                      throw Exception('Please enter a valid email address');
+                    }
+                    if (_password.text.length < 6) throw Exception('Password must be at least 6 characters');
                     if (_password.text != _confirm.text) throw Exception('Passwords do not match');
-                    if (_phone.text.trim().isEmpty) throw Exception('Phone number is required');
-                    await _auth.register(_name.text.trim(), _phone.text.trim(), _email.text.trim(), _password.text);
+                    
+                    await _auth.register(name, phone, email, _password.text);
                   }),
           ),
         ],

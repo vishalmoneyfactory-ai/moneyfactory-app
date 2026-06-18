@@ -640,30 +640,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                 .toList(),
           ),
           const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(child: _priceDisplay(bundle, large: true)),
-              if (_asNum(data['savings']) > 0)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.success.withValues(alpha: .15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '${_percentOff(data['savings'], data['individualTotal'])}% OFF bundle',
-                    style: const TextStyle(
-                      color: AppColors.success,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-            ],
-          ),
+          _priceDisplay(bundle, large: true),
           const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
