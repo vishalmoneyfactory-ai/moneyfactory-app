@@ -258,6 +258,11 @@ Earn with Money Factory.
                           delay: const Duration(milliseconds: 210),
                           child: _referralTools(code),
                         ),
+                        const SizedBox(height: 30),
+                        FadeSlideIn(
+                          delay: const Duration(milliseconds: 270),
+                          child: _referralTable(),
+                        ),
                       ],
                     ),
                   ),
@@ -613,6 +618,87 @@ Earn with Money Factory.
       ),
     ],
   );
+
+  Widget _referralTable() {
+    const data = [
+      {'course': 'Basics of forex', 'price': 'Free', 'referral': 'N/A'},
+      {'course': 'Candlestick & chart', 'price': '1999', 'referral': '300'},
+      {'course': 'Smart Money Concept', 'price': '1999', 'referral': '300'},
+      {'course': 'Candle range theory', 'price': '1999', 'referral': '300'},
+      {'course': 'Liquidity concept', 'price': '1999', 'referral': '300'},
+      {'course': 'Money factory indicator', 'price': '4999', 'referral': '1000'},
+      {'course': 'Bundle Course', 'price': '12999', 'referral': '2000'},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _kicker('Reward Structure'),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.line(context)),
+            borderRadius: BorderRadius.circular(12),
+            color: AppColors.surface(context),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Table(
+              border: TableBorder(
+                horizontalInside: BorderSide(color: AppColors.line(context)),
+                verticalInside: BorderSide(color: AppColors.line(context)),
+              ),
+              columnWidths: const {
+                0: FlexColumnWidth(2),
+                1: FlexColumnWidth(1.2),
+                2: FlexColumnWidth(1.2),
+              },
+              children: [
+                TableRow(
+                  decoration: BoxDecoration(color: AppColors.card(context)),
+                  children: [
+                    _tableHeader('Course'),
+                    _tableHeader('Price'),
+                    _tableHeader('Reward'),
+                  ],
+                ),
+                ...data.map((item) => TableRow(
+                      children: [
+                        _tableCell(item['course']!, isMain: true),
+                        _tableCell(item['price'] == 'Free' ? 'Free' : 'Rs ${item['price']}'),
+                        _tableCell(item['referral'] == 'N/A' ? '-' : 'Rs ${item['referral']}', isGold: item['referral'] != 'N/A'),
+                      ],
+                    )),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _tableHeader(String text) => Padding(
+        padding: const EdgeInsets.all(12),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: AppColors.mutedText(context),
+            fontWeight: FontWeight.w800,
+            fontSize: 12,
+          ),
+        ),
+      );
+
+  Widget _tableCell(String text, {bool isMain = false, bool isGold = false}) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: isGold ? AppColors.gold : (isMain ? AppColors.text(context) : AppColors.mutedText(context)),
+            fontWeight: isMain || isGold ? FontWeight.w700 : FontWeight.w600,
+            fontSize: 13,
+          ),
+        ),
+      );
 
   Widget _kicker(String text) => Padding(
     padding: const EdgeInsets.only(bottom: 10),
