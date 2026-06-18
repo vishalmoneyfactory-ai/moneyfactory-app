@@ -204,7 +204,7 @@ Earn with Money Factory.
       body: Container(
         decoration: BoxDecoration(gradient: AppColors.pageGradient(context)),
         child: RefreshIndicator(
-          color: AppColors.gold,
+          color: AppColors.themeGold(context),
           onRefresh: _refresh,
           child: FutureBuilder<Map<String, dynamic>>(
             future: _userFuture,
@@ -302,7 +302,7 @@ Earn with Money Factory.
                         colors: [
                           AppColors.neonBlue.withValues(alpha: .25),
                           AppColors.violet.withValues(alpha: .20),
-                          AppColors.gold.withValues(alpha: .12),
+                          AppColors.themeGold(context).withValues(alpha: .12),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -339,7 +339,7 @@ Earn with Money Factory.
                                   children: [
                                     IconButton(
                                       iconSize: 42,
-                                      color: AppColors.gold,
+                                      color: AppColors.themeGold(context),
                                       icon: const Icon(Icons.replay_10),
                                       onPressed: () => _seekBy(-10),
                                     ),
@@ -351,11 +351,11 @@ Earn with Money Factory.
                                         width: 74,
                                         height: 74,
                                         decoration: BoxDecoration(
-                                          color: AppColors.gold.withValues(alpha: .92),
+                                          color: AppColors.themeGold(context).withValues(alpha: .92),
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
-                                              color: AppColors.gold.withValues(alpha: .35),
+                                              color: AppColors.themeGold(context).withValues(alpha: .35),
                                               blurRadius: 28,
                                             ),
                                           ],
@@ -372,7 +372,7 @@ Earn with Money Factory.
                                     const SizedBox(width: 24),
                                     IconButton(
                                       iconSize: 42,
-                                      color: AppColors.gold,
+                                      color: AppColors.themeGold(context),
                                       icon: const Icon(Icons.forward_10),
                                       onPressed: () => _seekBy(10),
                                     ),
@@ -401,8 +401,8 @@ Earn with Money Factory.
                                           child: VideoProgressIndicator(
                                             controller,
                                             allowScrubbing: true,
-                                            colors: const VideoProgressColors(
-                                              playedColor: AppColors.gold,
+                                            colors: VideoProgressColors(
+                                              playedColor: AppColors.themeGold(context),
                                               bufferedColor: Colors.white24,
                                               backgroundColor: Colors.white12,
                                             ),
@@ -430,9 +430,9 @@ Earn with Money Factory.
                     ),
                   )
                 else if (_loadingVideo)
-                  const Positioned.fill(
+                  Positioned.fill(
                     child: Center(
-                      child: CircularProgressIndicator(color: AppColors.gold),
+                      child: CircularProgressIndicator(color: AppColors.themeGold(context)),
                     ),
                   )
                 else
@@ -447,11 +447,11 @@ Earn with Money Factory.
                             width: 74,
                             height: 74,
                             decoration: BoxDecoration(
-                              color: AppColors.gold.withValues(alpha: .92),
+                              color: AppColors.themeGold(context).withValues(alpha: .92),
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.gold.withValues(alpha: .35),
+                                  color: AppColors.themeGold(context).withValues(alpha: .35),
                                   blurRadius: 28,
                                 ),
                               ],
@@ -565,8 +565,8 @@ Earn with Money Factory.
       CountUpNumber(
         value: value,
         prefix: prefix,
-        style: const TextStyle(
-          color: AppColors.gold,
+        style: TextStyle(
+          color: AppColors.themeGold(context),
           fontFamily: 'JetBrains Mono',
           fontSize: 28,
           fontWeight: FontWeight.w900,
@@ -693,7 +693,7 @@ Earn with Money Factory.
         child: Text(
           text,
           style: TextStyle(
-            color: isGold ? AppColors.gold : (isMain ? AppColors.text(context) : AppColors.mutedText(context)),
+            color: isGold ? AppColors.themeGold(context) : (isMain ? AppColors.text(context) : AppColors.mutedText(context)),
             fontWeight: isMain || isGold ? FontWeight.w700 : FontWeight.w600,
             fontSize: 13,
           ),
@@ -704,8 +704,8 @@ Earn with Money Factory.
     padding: const EdgeInsets.only(bottom: 10),
     child: Text(
       text.toUpperCase(),
-      style: const TextStyle(
-        color: AppColors.gold,
+      style: TextStyle(
+        color: AppColors.themeGold(context),
         fontSize: 12,
         fontWeight: FontWeight.w900,
         letterSpacing: 1.5,
