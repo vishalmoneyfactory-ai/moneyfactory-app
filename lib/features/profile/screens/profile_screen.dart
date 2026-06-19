@@ -960,10 +960,10 @@ $link
           filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
           child: Container(
             padding: EdgeInsets.fromLTRB(
-              22,
-              22,
-              22,
-              MediaQuery.of(context).viewInsets.bottom + 32,
+              20,
+              24,
+              20,
+              MediaQuery.of(context).viewInsets.bottom + 120,
             ),
             decoration: BoxDecoration(
               gradient: AppColors.pageGradient(context),
@@ -1161,7 +1161,7 @@ $link
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
           child: Container(
-            padding: const EdgeInsets.fromLTRB(22, 22, 22, 42),
+            padding: const EdgeInsets.fromLTRB(22, 22, 22, 122),
             decoration: BoxDecoration(
               gradient: AppColors.pageGradient(context),
               border: Border(top: BorderSide(color: AppColors.themeGold(context).withValues(alpha: .32))),
@@ -1328,7 +1328,7 @@ $link
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
           child: Container(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 42),
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 122),
             decoration: BoxDecoration(
               gradient: AppColors.pageGradient(context),
               border: Border(top: BorderSide(color: AppColors.themeGold(context).withValues(alpha: .32))),
