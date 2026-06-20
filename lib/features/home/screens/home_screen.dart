@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/api/api_service.dart';
@@ -481,7 +482,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       const SizedBox(height: 18),
       _socialRow(
-        Icons.camera_alt_outlined,
+        FaIcon(FontAwesomeIcons.instagram, color: AppColors.white),
         'Instagram',
         '@trader_vicky1',
         () => _launch(
@@ -489,13 +490,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       _socialRow(
-        Icons.chat_outlined,
+        FaIcon(FontAwesomeIcons.whatsapp, color: AppColors.white),
         'Whatsapp',
         '+91 8446519926',
         () => _launch('https://wa.me/918446519926'),
       ),
       _socialRow(
-        Icons.send_outlined,
+        FaIcon(FontAwesomeIcons.telegram, color: AppColors.white),
         'Telegram',
         'money_factory_indicator',
         () => _launch('https://t.me/money_factory_indicator'),
@@ -504,7 +505,7 @@ class _HomeScreenState extends State<HomeScreen> {
   );
 
   Widget _socialRow(
-    IconData icon,
+    Widget iconWidget,
     String title,
     String subtitle,
     VoidCallback onTap,
@@ -529,7 +530,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              child: Icon(icon, color: AppColors.white),
+              child: Center(child: iconWidget),
             ),
             const SizedBox(width: 15),
             Expanded(

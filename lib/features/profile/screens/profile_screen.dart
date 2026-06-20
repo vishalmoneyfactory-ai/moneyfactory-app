@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -1203,7 +1204,7 @@ $link
                 const SizedBox(height: 26),
 
                 _contactTile(
-                  icon: Icons.email_outlined,
+                  iconWidget: const Icon(Icons.email_outlined, color: Color(0xFF4CAF50), size: 24),
                   color: const Color(0xFF4CAF50),
                   label: 'Mail Us',
                   subtitle: 'vishalmoneyfactory@gmail.com',
@@ -1211,7 +1212,7 @@ $link
                 ),
                 const SizedBox(height: 12),
                 _contactTile(
-                  icon: Icons.chat_outlined,
+                  iconWidget: const FaIcon(FontAwesomeIcons.whatsapp, color: Color(0xFF25D366), size: 24),
                   color: const Color(0xFF25D366),
                   label: 'Contact via WhatsApp',
                   subtitle: '+91 8446519926',
@@ -1219,7 +1220,7 @@ $link
                 ),
                 const SizedBox(height: 12),
                 _contactTile(
-                  icon: Icons.camera_alt_outlined,
+                  iconWidget: const FaIcon(FontAwesomeIcons.instagram, color: Color(0xFFE1306C), size: 24),
                   color: const Color(0xFFE1306C),
                   label: 'Instagram',
                   subtitle: '@trader_vicky1',
@@ -1236,7 +1237,7 @@ $link
   }
 
   Widget _contactTile({
-    required IconData icon,
+    required Widget iconWidget,
     required Color color,
     required String label,
     required String subtitle,
@@ -1261,7 +1262,7 @@ $link
                 color: color.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: color, size: 24),
+              child: Center(child: iconWidget),
             ),
             const SizedBox(width: 16),
             Expanded(
