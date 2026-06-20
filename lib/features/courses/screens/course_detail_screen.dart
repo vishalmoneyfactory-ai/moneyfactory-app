@@ -335,7 +335,7 @@ class CourseDetailScreen extends StatelessWidget {
                     margin: const EdgeInsets.only(top: 3),
                     padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
-                      color: AppColors.success.withValues(alpha: .15),
+                      color: AppColors.themeSuccess(context).withValues(alpha: .15),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -428,13 +428,13 @@ class CourseDetailScreen extends StatelessWidget {
             ? Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.success.withValues(alpha: .15),
+                  color: AppColors.themeSuccess(context).withValues(alpha: .15),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Text(
+                child: Text(
                   'FREE',
                   style: TextStyle(
-                    color: AppColors.success,
+                    color: AppColors.themeSuccess(context),
                     fontSize: 10,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0.8,
@@ -479,8 +479,8 @@ class CourseDetailScreen extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
         ),
         style: FilledButton.styleFrom(
-          backgroundColor: owned ? AppColors.success : AppColors.themeGold(context),
-          foregroundColor: AppColors.primaryBg,
+          backgroundColor: owned ? AppColors.success : AppColors.themeButtonColor(context),
+          foregroundColor: owned ? AppColors.white : AppColors.themeButtonText(context),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -594,13 +594,13 @@ class CourseDetailScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
             decoration: BoxDecoration(
-              color: AppColors.success.withValues(alpha: .15),
+              color: AppColors.themeSuccess(context).withValues(alpha: .15),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
               '${course['offerPercent'] ?? 0}% OFF',
-              style: const TextStyle(
-                color: AppColors.success,
+              style: TextStyle(
+                color: AppColors.themeSuccess(context),
                 fontSize: 11,
                 fontWeight: FontWeight.w900,
               ),

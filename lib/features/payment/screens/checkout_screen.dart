@@ -192,7 +192,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     _line(
                       'Offer ${_course?['offerPercent'] ?? 0}% off',
                       '-${money(_course?['offerDiscount'] ?? (originalPrice - price))}',
-                      color: AppColors.success,
+                      color: AppColors.themeSuccess(context),
                     ),
                     _line('Offer price', money(price), color: AppColors.themeGold(context)),
                   ] else
@@ -200,7 +200,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   _line(
                     'Coupon discount',
                     '-${money(_discount)}',
-                    color: AppColors.success,
+                    color: AppColors.themeSuccess(context),
                   ),
                   Divider(color: AppColors.line(context)),
                   _line('Total', money(total), color: AppColors.themeGold(context)),

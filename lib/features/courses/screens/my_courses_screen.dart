@@ -954,19 +954,19 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: AppColors.success.withValues(alpha: .15),
+            color: AppColors.themeSuccess(context).withValues(alpha: .15),
             borderRadius: BorderRadius.circular(99),
             boxShadow: [
               BoxShadow(
-                color: AppColors.success.withValues(alpha: .10),
+                color: AppColors.themeSuccess(context).withValues(alpha: .10),
                 blurRadius: 18,
               ),
             ],
           ),
           child: Text(
             '${percent.round()}% OFF',
-            style: const TextStyle(
-              color: AppColors.success,
+            style: TextStyle(
+              color: AppColors.themeSuccess(context),
               fontSize: 12,
               fontWeight: FontWeight.w900,
             ),

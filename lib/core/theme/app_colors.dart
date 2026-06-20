@@ -7,9 +7,11 @@ class AppColors {
   static const border = Color(0x80283547); // 50% opacity border
   static const gold = Color(0xFFFFC857);
   static const goldDark = Color(0xFF1A365D); // Deep navy blue for light mode
+  static const buttonBlueLight = Color(0xFF3B82F6); // Lighter blue for buttons in light mode
   static const goldGlow = Color(0x33FFC857);
   static const neonBlue = Color(0xFF24C6FF);
   static const success = Color(0xFF00D084);
+  static const successDark = Color(0xFF15803D); // Darker green for light mode
   static const error = Color(0xFFFF4D67);
   static const white = Color(0xFFFFFFFF);
   static const muted = Color(0xFFA7B3C4);
@@ -31,6 +33,9 @@ class AppColors {
   static Color text(BuildContext context) => isDark(context) ? white : lightText;
   static Color mutedText(BuildContext context) => isDark(context) ? muted : lightMuted;
   static Color themeGold(BuildContext context) => isDark(context) ? gold : goldDark;
+  static Color themeButtonColor(BuildContext context) => isDark(context) ? gold : buttonBlueLight;
+  static Color themeButtonText(BuildContext context) => isDark(context) ? primaryBg : white;
+  static Color themeSuccess(BuildContext context) => isDark(context) ? success : successDark;
   static Color themeGoldGlow(BuildContext context) => isDark(context) ? goldGlow : goldDark.withValues(alpha: .2);
   
   static LinearGradient pageGradient(BuildContext context) => isDark(context)

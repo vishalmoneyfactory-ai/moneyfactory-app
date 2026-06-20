@@ -501,18 +501,18 @@ $link
                   bottom: -2,
                   right: -2,
                   child: Material(
-                    color: AppColors.themeGold(context),
+                    color: AppColors.themeButtonColor(context),
                     shape: const CircleBorder(),
                     elevation: 6,
-                    shadowColor: AppColors.themeGold(context).withValues(alpha: .4),
+                    shadowColor: AppColors.themeButtonColor(context).withValues(alpha: .4),
                     child: InkWell(
                       customBorder: const CircleBorder(),
                       onTap: _busy ? null : _pickProfileImage,
-                      child: const Padding(
-                        padding: EdgeInsets.all(10),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
                         child: Icon(
                           Icons.camera_alt,
-                          color: AppColors.primaryBg,
+                          color: AppColors.themeButtonText(context),
                           size: 20,
                         ),
                       ),
@@ -665,8 +665,8 @@ $link
               icon: Icon(Icons.share, size: 18),
               label: Text('Share Referral Code', style: TextStyle(fontWeight: FontWeight.w800)),
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.themeGold(context),
-                foregroundColor: AppColors.primaryBg,
+                backgroundColor: AppColors.themeButtonColor(context),
+                foregroundColor: AppColors.themeButtonText(context),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
               onPressed: () => _shareReferral(user, settings),
@@ -874,8 +874,8 @@ $link
         FilledButton(
           onPressed: () => context.go('/home'),
           style: FilledButton.styleFrom(
-            backgroundColor: AppColors.themeGold(context),
-            foregroundColor: AppColors.primaryBg,
+            backgroundColor: AppColors.themeButtonColor(context),
+            foregroundColor: AppColors.themeButtonText(context),
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           ),
@@ -1122,8 +1122,8 @@ $link
                       icon: Icon(Icons.save_outlined),
                       label: Text('Save Changes', style: TextStyle(fontWeight: FontWeight.w800)),
                       style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.themeGold(context),
-                        foregroundColor: AppColors.primaryBg,
+                        backgroundColor: AppColors.themeButtonColor(context),
+                        foregroundColor: AppColors.themeButtonText(context),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
                       onPressed: () async {
