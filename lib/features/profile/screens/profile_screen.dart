@@ -1215,8 +1215,8 @@ $link
                   iconWidget: const FaIcon(FontAwesomeIcons.whatsapp, color: Color(0xFF25D366), size: 24),
                   color: const Color(0xFF25D366),
                   label: 'Contact via WhatsApp',
-                  subtitle: '+91 8446519926',
-                  onTap: () => _launchUrl('https://wa.me/918446519926'),
+                  subtitle: '+91 7522929338',
+                  onTap: () => _launchUrl('https://wa.me/917522929338'),
                 ),
                 const SizedBox(height: 12),
                 _contactTile(

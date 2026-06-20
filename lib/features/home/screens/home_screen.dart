@@ -498,8 +498,8 @@ class _HomeScreenState extends State<HomeScreen> {
       _socialRow(
         FaIcon(FontAwesomeIcons.whatsapp, color: AppColors.white),
         'Whatsapp',
-        '+91 8446519926',
-        () => _launch('https://wa.me/918446519926'),
+        '+91 7522929338',
+        () => _launch('https://wa.me/917522929338'),
         color: const Color(0xFF25D366),
       ),
       _socialRow(
