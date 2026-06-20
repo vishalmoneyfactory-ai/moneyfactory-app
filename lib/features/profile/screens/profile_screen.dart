@@ -357,13 +357,19 @@ $link
                                 ),
                               ),
                               ...filteredLegal.map(
-                                (p) => _tile(
-                                  context,
-                                  p['title'],
-                                  'Legal documentation',
-                                  Icons.article_outlined,
-                                  () => _showText(context, p['title'], p['content']),
-                                ),
+                                (p) {
+                                  String content = p['content']?.toString() ?? '';
+                                  if (p['title'].toString().toLowerCase().contains('term') || p['title'].toString().toLowerCase().contains('condition')) {
+                                    content += '\n\n• No money will be refunded after the purchase of any course.';
+                                  }
+                                  return _tile(
+                                    context,
+                                    p['title'],
+                                    'Legal documentation',
+                                    Icons.article_outlined,
+                                    () => _showText(context, p['title'], content),
+                                  );
+                                }
                               ),
                               const SizedBox(height: 12),
                               InkWell(
