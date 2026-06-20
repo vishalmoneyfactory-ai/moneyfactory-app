@@ -579,27 +579,27 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _reviews() {
     final rows = [
       (
-        'Soumik Chaudhuri',
+        'Sarthak Satpute',
         4.5,
         'Clean signals and the liquidity view makes the chart much easier to understand.',
       ),
       (
-        'Aarav Mehta',
+        'Om Patil',
         4.0,
         'The course flow is simple and practical. I liked how quickly I could revise videos.',
       ),
       (
-        'Priya Sharma',
+        'Sai Pansare',
         5.0,
         'Premium feel, clear lessons, and the indicator logic is explained very well.',
       ),
       (
-        'Rohit Patil',
+        'Prajwal Rahane',
         4.5,
         'The app helped me stay disciplined instead of jumping between random strategies.',
       ),
       (
-        'Neha Verma',
+        'Onkar Hase',
         5.0,
         'Great learning experience for Gold trading with useful structure-based examples.',
       ),
