@@ -110,6 +110,7 @@ class CourseDetailScreen extends StatelessWidget {
                             ),
                           ),
                           if (outcomes.isNotEmpty) ...[
+                            _sectionKicker(context, 'What You Will Learn'),
                             const SizedBox(height: 24),
                             FadeSlideIn(
                               delay: const Duration(milliseconds: 220),
@@ -119,7 +120,7 @@ class CourseDetailScreen extends StatelessWidget {
                           const SizedBox(height: 32),
                           FadeSlideIn(
                             delay: const Duration(milliseconds: 260),
-                            child: _sectionKicker('Curriculum'),
+                            child: _sectionKicker(context, 'Curriculum'),
                           ),
                           FadeSlideIn(
                             delay: const Duration(milliseconds: 260),
@@ -148,7 +149,7 @@ class CourseDetailScreen extends StatelessWidget {
                           const SizedBox(height: 32),
                           FadeSlideIn(
                             delay: const Duration(milliseconds: 600),
-                            child: _sectionKicker('About'),
+                            child: _sectionKicker(context, 'About'),
                           ),
                           FadeSlideIn(
                             delay: const Duration(milliseconds: 600),
@@ -197,7 +198,7 @@ class CourseDetailScreen extends StatelessWidget {
                           color: AppColors.bg(context).withValues(alpha: .7),
                           border: Border(
                             top: BorderSide(
-                              color: AppColors.gold.withValues(alpha: .2),
+                              color: AppColors.themeGold(context).withValues(alpha: .2),
                             ),
                           ),
                         ),
@@ -268,7 +269,7 @@ class CourseDetailScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         gradient: LinearGradient(
           colors: [
-            AppColors.gold.withValues(alpha: .38),
+            AppColors.themeGold(context).withValues(alpha: .38),
             AppColors.neonBlue.withValues(alpha: .14),
             Colors.transparent,
           ],
@@ -277,7 +278,7 @@ class CourseDetailScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.gold.withValues(alpha: .08),
+            color: AppColors.themeGold(context).withValues(alpha: .08),
             blurRadius: 38,
             offset: const Offset(0, 16),
           ),
@@ -292,7 +293,7 @@ class CourseDetailScreen extends StatelessWidget {
               ? Center(
                   child: Icon(
                     Icons.school,
-                    color: AppColors.gold.withValues(alpha: .4),
+                    color: AppColors.themeGold(context).withValues(alpha: .4),
                     size: 80,
                   ),
                 )
@@ -321,7 +322,7 @@ class CourseDetailScreen extends StatelessWidget {
             style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17),
           ),
           initiallyExpanded: true,
-          iconColor: AppColors.gold,
+          iconColor: AppColors.themeGold(context),
           collapsedIconColor: AppColors.mutedText(context),
           childrenPadding: const EdgeInsets.only(bottom: 12),
           children: outcomes.map((o) {
@@ -378,7 +379,7 @@ class CourseDetailScreen extends StatelessWidget {
         boxShadow: canPlay
             ? [
                 BoxShadow(
-                  color: AppColors.gold.withValues(alpha: .04),
+                  color: AppColors.themeGold(context).withValues(alpha: .04),
                   blurRadius: 14,
                   offset: const Offset(0, 6),
                 ),
@@ -392,13 +393,13 @@ class CourseDetailScreen extends StatelessWidget {
           height: 48,
           decoration: BoxDecoration(
             color: canPlay
-                ? AppColors.gold.withValues(alpha: .15)
+                ? AppColors.themeGold(context).withValues(alpha: .15)
                 : AppColors.surface(context),
             shape: BoxShape.circle,
           ),
           child: Icon(
             canPlay ? Icons.play_arrow_rounded : Icons.lock_outline_rounded,
-            color: canPlay ? AppColors.gold : AppColors.mutedText(context),
+            color: canPlay ? AppColors.themeGold(context) : AppColors.mutedText(context),
             size: 26,
           ),
         ),
@@ -478,7 +479,7 @@ class CourseDetailScreen extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
         ),
         style: FilledButton.styleFrom(
-          backgroundColor: owned ? AppColors.success : AppColors.gold,
+          backgroundColor: owned ? AppColors.success : AppColors.themeGold(context),
           foregroundColor: AppColors.primaryBg,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
@@ -553,7 +554,7 @@ class CourseDetailScreen extends StatelessWidget {
       return Text(
         money(course['price'] ?? 0),
         style: TextStyle(
-          color: AppColors.gold,
+          color: AppColors.themeGold(context),
           fontFamily: 'JetBrains Mono',
           fontSize: compact ? 22 : 28,
           fontWeight: FontWeight.w900,
@@ -570,7 +571,7 @@ class CourseDetailScreen extends StatelessWidget {
         Text(
           money(effective),
           style: TextStyle(
-            color: AppColors.gold,
+            color: AppColors.themeGold(context),
             fontFamily: 'JetBrains Mono',
             fontSize: compact ? 22 : 28,
             fontWeight: FontWeight.w900,
@@ -657,12 +658,12 @@ class CourseDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _sectionKicker(String text) => Padding(
+  Widget _sectionKicker(BuildContext context, String text) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
     child: Text(
       text.toUpperCase(),
-      style: const TextStyle(
-        color: AppColors.gold,
+      style: TextStyle(
+        color: AppColors.themeGold(context),
         fontSize: 12,
         fontWeight: FontWeight.w900,
         letterSpacing: 1.8,

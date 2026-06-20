@@ -1,12 +1,15 @@
 import 'dart:io';
+
 void main() {
-  var file = File('lib/features/earn/screens/earn_screen.dart');
-  var content = file.readAsStringSync();
-  content = content.replaceAll('AppColors.gold,', 'AppColors.themeGold(context),');
-  content = content.replaceAll('AppColors.gold.', 'AppColors.themeGold(context).');
-  content = content.replaceAll('AppColors.gold ?', 'AppColors.themeGold(context) ?');
-  content = content.replaceAll('AppColors.gold :', 'AppColors.themeGold(context) :');
-  content = content.replaceAll('AppColors.gold)', 'AppColors.themeGold(context))');
-  content = content.replaceAllMapped(RegExp(r'const\s+TextStyle\([^)]*AppColors\.themeGold\(context\)[^)]*\)'), (m) => m.group(0)!.replaceAll('const ', ''));
-  file.writeAsStringSync(content);
+  final libDir = Directory('lib');
+  for (var file in libDir.listSync(recursive: true)) {
+    if (file is File && file.path.endsWith('.dart') && !file.path.endsWith('app_colors.dart') && !file.path.endsWith('app_theme.dart')) {
+      var content = file.readAsStringSync();
+      var replaced = content.replaceAll('AppColors.gold', 'AppColors.themeGold(context)');
+      if (content != replaced) {
+        file.writeAsStringSync(replaced);
+        print('Updated \${file.path}');
+      }
+    }
+  }
 }

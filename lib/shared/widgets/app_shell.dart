@@ -71,7 +71,7 @@ class AppShell extends StatelessWidget {
                       if (value == 3) context.go('/profile');
                     },
                     backgroundColor: Colors.transparent,
-                    indicatorColor: AppColors.goldGlow,
+                    indicatorColor: AppColors.themeGoldGlow(context),
                     destinations: const [
                       NavigationDestination(
                         icon: Icon(Icons.home_outlined),

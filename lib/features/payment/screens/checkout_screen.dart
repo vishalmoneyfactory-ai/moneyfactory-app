@@ -136,8 +136,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Checkout')),
       body: _course == null
-          ? const Center(
-              child: CircularProgressIndicator(color: AppColors.gold),
+          ? Center(
+              child: CircularProgressIndicator(color: AppColors.themeGold(context)),
             )
           : ListView(
               padding: const EdgeInsets.all(16),
@@ -194,7 +194,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       '-${money(_course?['offerDiscount'] ?? (originalPrice - price))}',
                       color: AppColors.success,
                     ),
-                    _line('Offer price', money(price), color: AppColors.gold),
+                    _line('Offer price', money(price), color: AppColors.themeGold(context)),
                   ] else
                     _line('Original', money(price)),
                   _line(
@@ -203,15 +203,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     color: AppColors.success,
                   ),
                   Divider(color: AppColors.line(context)),
-                  _line('Total', money(total), color: AppColors.gold),
+                  _line('Total', money(total), color: AppColors.themeGold(context)),
                 ]),
                 if (!widget.isBundle) ...[
                   const SizedBox(height: 14),
                   _box([
-                    const Text(
+                    Text(
                       'Get ALL 6 courses for Rs 4999',
                       style: TextStyle(
-                        color: AppColors.gold,
+                        color: AppColors.themeGold(context),
                         fontWeight: FontWeight.w900,
                       ),
                     ),

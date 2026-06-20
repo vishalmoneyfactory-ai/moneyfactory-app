@@ -589,9 +589,9 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                   color: AppColors.themeGold(context).withValues(alpha: .2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.stars_rounded,
-                  color: AppColors.gold,
+                  color: AppColors.themeGold(context),
                   size: 24,
                 ),
               ),

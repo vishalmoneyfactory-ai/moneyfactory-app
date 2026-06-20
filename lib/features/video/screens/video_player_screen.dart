@@ -242,7 +242,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       body: Container(
         decoration: BoxDecoration(gradient: AppColors.pageGradient(context)),
         child: _controller == null || !_controller!.value.isInitialized
-            ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+            ? Center(child: CircularProgressIndicator(color: AppColors.themeGold(context)))
             : ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
@@ -253,7 +253,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     style: TextStyle(color: AppColors.text(context), fontSize: 22, fontWeight: FontWeight.w900),
                   ),
                   const SizedBox(height: 12),
-                  LinearProgressIndicator(value: _completion(widget.videoId), backgroundColor: AppColors.line(context), color: AppColors.gold),
+                  LinearProgressIndicator(value: _completion(widget.videoId), backgroundColor: AppColors.line(context), color: AppColors.themeGold(context)),
                   const SizedBox(height: 24),
                   Text('Course Content', style: TextStyle(color: AppColors.text(context), fontSize: 18, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 12),
@@ -263,12 +263,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       decoration: BoxDecoration(
-                        color: active ? AppColors.gold.withValues(alpha: .1) : AppColors.card(context),
+                        color: active ? AppColors.themeGold(context).withValues(alpha: .1) : AppColors.card(context),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: active ? AppColors.gold : AppColors.line(context)),
+                        border: Border.all(color: active ? AppColors.themeGold(context) : AppColors.line(context)),
                       ),
                       child: ListTile(
-                        leading: Icon(done ? Icons.check_circle : Icons.play_circle_outline, color: done ? AppColors.success : AppColors.gold),
+                        leading: Icon(done ? Icons.check_circle : Icons.play_circle_outline, color: done ? AppColors.success : AppColors.themeGold(context)),
                         title: Text(v['title'], style: TextStyle(color: AppColors.text(context), fontWeight: active ? FontWeight.w800 : FontWeight.w600)),
                         subtitle: Text(durationLabel(v['duration'] ?? 0), style: TextStyle(color: AppColors.mutedText(context))),
                       ),
@@ -385,7 +385,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       child: VideoProgressIndicator(
                         controller,
                         allowScrubbing: true,
-                        colors: VideoProgressColors(playedColor: AppColors.gold, bufferedColor: Colors.white30, backgroundColor: Colors.white12),
+                        colors: VideoProgressColors(playedColor: AppColors.themeGold(context), bufferedColor: Colors.white30, backgroundColor: Colors.white12),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -438,7 +438,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               child: ChoiceChip(
                 label: Text(q, style: TextStyle(fontWeight: FontWeight.w600, color: _quality == q ? AppColors.primaryBg : AppColors.text(context))),
                 selected: _quality == q,
-                selectedColor: AppColors.gold,
+                selectedColor: AppColors.themeGold(context),
                 backgroundColor: AppColors.card(context),
                 onSelected: (_) => _switchQuality(q),
               ),
@@ -454,7 +454,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               return ChoiceChip(
                 label: Text(label, style: TextStyle(fontWeight: FontWeight.w600, color: _speed == s ? AppColors.primaryBg : AppColors.text(context))),
                 selected: _speed == s,
-                selectedColor: AppColors.gold,
+                selectedColor: AppColors.themeGold(context),
                 backgroundColor: AppColors.card(context),
                 onSelected: (_) => _setSpeed(s),
               );

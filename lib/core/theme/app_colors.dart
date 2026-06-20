@@ -6,7 +6,7 @@ class AppColors {
   static const cardBg = Color(0xB3151E2B); // 70% opacity for glass bleed
   static const border = Color(0x80283547); // 50% opacity border
   static const gold = Color(0xFFFFC857);
-  static const goldDark = Color(0xFF997300); // Darker, rich gold for light mode
+  static const goldDark = Color(0xFF1A365D); // Deep navy blue for light mode
   static const goldGlow = Color(0x33FFC857);
   static const neonBlue = Color(0xFF24C6FF);
   static const success = Color(0xFF00D084);
@@ -31,6 +31,7 @@ class AppColors {
   static Color text(BuildContext context) => isDark(context) ? white : lightText;
   static Color mutedText(BuildContext context) => isDark(context) ? muted : lightMuted;
   static Color themeGold(BuildContext context) => isDark(context) ? gold : goldDark;
+  static Color themeGoldGlow(BuildContext context) => isDark(context) ? goldGlow : goldDark.withValues(alpha: .2);
   
   static LinearGradient pageGradient(BuildContext context) => isDark(context)
       ? const LinearGradient(
@@ -55,11 +56,17 @@ class AppColors {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
-  static LinearGradient premiumGradient(BuildContext context) => const LinearGradient(
-        colors: [gold, Color(0xFFFFE08A)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      );
+  static LinearGradient premiumGradient(BuildContext context) => isDark(context)
+      ? const LinearGradient(
+          colors: [gold, Color(0xFFFFE08A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        )
+      : const LinearGradient(
+          colors: [goldDark, Color(0xFF2B6CB0)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
   static LinearGradient accentGradient(BuildContext context) => const LinearGradient(
         colors: [neonBlue, violet],
         begin: Alignment.topLeft,

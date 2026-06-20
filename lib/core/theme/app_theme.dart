@@ -60,7 +60,7 @@ class AppTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.lightCard,
-        indicatorColor: AppColors.goldGlow,
+        indicatorColor: AppColors.goldDark.withValues(alpha: .2),
         labelTextStyle: WidgetStateProperty.resolveWith(
           (states) => TextStyle(
             color: states.contains(WidgetState.selected)
