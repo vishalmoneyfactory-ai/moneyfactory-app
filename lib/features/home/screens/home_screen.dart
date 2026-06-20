@@ -488,18 +488,26 @@ class _HomeScreenState extends State<HomeScreen> {
         () => _launch(
           'https://www.instagram.com/trader_vicky1?igsh=MWVlamdmbmRtcXZmaQ==',
         ),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFf09433), Color(0xFFe6683c), Color(0xFFdc2743), Color(0xFFcc2366), Color(0xFFbc1888)],
+          begin: Alignment.bottomLeft,
+          end: Alignment.topRight,
+        ),
+        shadowColor: const Color(0xFFdc2743),
       ),
       _socialRow(
         FaIcon(FontAwesomeIcons.whatsapp, color: AppColors.white),
         'Whatsapp',
         '+91 8446519926',
         () => _launch('https://wa.me/918446519926'),
+        color: const Color(0xFF25D366),
       ),
       _socialRow(
         FaIcon(FontAwesomeIcons.telegram, color: AppColors.white),
         'Telegram',
         'money_factory_indicator',
         () => _launch('https://t.me/money_factory_indicator'),
+        color: const Color(0xFF0088cc),
       ),
     ],
   );
@@ -508,8 +516,11 @@ class _HomeScreenState extends State<HomeScreen> {
     Widget iconWidget,
     String title,
     String subtitle,
-    VoidCallback onTap,
-  ) {
+    VoidCallback onTap, {
+    Color? color,
+    Gradient? gradient,
+    Color? shadowColor,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(18),
@@ -521,11 +532,12 @@ class _HomeScreenState extends State<HomeScreen> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                gradient: AppColors.accentGradient(context),
+                color: gradient == null ? (color ?? AppColors.neonBlue) : null,
+                gradient: gradient ?? (color == null ? AppColors.accentGradient(context) : null),
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.neonBlue.withValues(alpha: .18),
+                    color: (shadowColor ?? color ?? AppColors.neonBlue).withValues(alpha: .30),
                     blurRadius: 18,
                   ),
                 ],
