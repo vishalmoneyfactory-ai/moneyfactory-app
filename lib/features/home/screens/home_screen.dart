@@ -403,6 +403,15 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       const SizedBox(height: 24),
+      Text(
+        'Includes Two Indicators',
+        style: TextStyle(
+          color: AppColors.text(context),
+          fontSize: 20,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+      const SizedBox(height: 16),
       _indicatorLine(
         'Money factory indicator',
         'The Trigger',
