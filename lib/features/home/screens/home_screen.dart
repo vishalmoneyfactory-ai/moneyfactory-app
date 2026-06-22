@@ -705,7 +705,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   )
                 else
                   Image.asset(
-                    'assets/images/home_video_thumbnail.png',
+                    'assets/images/thumbnail.jpeg',
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return DecoratedBox(
@@ -909,7 +909,7 @@ class _HomeScreenState extends State<HomeScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF0D1117), // Assuming dark background for logo
+              color: AppColors.card(context),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: AppColors.themeGold(context).withValues(alpha: 0.3)),
               boxShadow: [
@@ -953,7 +953,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   child: Text(
-                    'DOWNLOAD NOW',
+                    'SIGN UP FOR FREE',
                     style: TextStyle(
                       color: AppColors.primaryBg,
                       fontWeight: FontWeight.w900,
