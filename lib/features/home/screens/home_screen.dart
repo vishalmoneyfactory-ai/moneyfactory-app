@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../core/api/api_service.dart';
 import '../../../core/theme/app_colors.dart';
@@ -23,6 +24,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _reviewTimer;
   int _reviewIndex = 0;
   bool _reviewsPaused = false;
+  
+  VideoPlayerController? _videoController;
+  bool _showControls = true;
+  Timer? _hideTimer;
+  bool _loadingVideo = false;
 
   @override
   void initState() {
@@ -42,9 +48,91 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _hideTimer?.cancel();
+    _videoController?.dispose();
     _reviewTimer?.cancel();
     _reviewController.dispose();
     super.dispose();
+  }
+
+  void _toggleControls() {
+    setState(() => _showControls = !_showControls);
+    _hideTimer?.cancel();
+    if (_showControls && _videoController?.value.isPlaying == true) {
+      _hideTimer = Timer(const Duration(seconds: 3), () {
+        if (mounted && _videoController?.value.isPlaying == true) {
+          setState(() => _showControls = false);
+        }
+      });
+    }
+  }
+
+  void _togglePlay() {
+    final controller = _videoController;
+    if (controller == null) return;
+    if (controller.value.isPlaying) {
+      controller.pause();
+      setState(() => _showControls = true);
+      _hideTimer?.cancel();
+    } else {
+      controller.play();
+      setState(() => _showControls = false);
+      _hideTimer?.cancel();
+    }
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    return duration.inHours > 0 ? '${duration.inHours}:$minutes:$seconds' : '$minutes:$seconds';
+  }
+
+  void _seekBy(int seconds) {
+    final controller = _videoController;
+    if (controller == null || !controller.value.isInitialized) return;
+    final targetMs = controller.value.position.inMilliseconds + (seconds * 1000);
+    final maxMs = controller.value.duration.inMilliseconds;
+    controller.seekTo(Duration(milliseconds: targetMs.clamp(0, maxMs).toInt()));
+    setState(() => _showControls = true);
+    _hideTimer?.cancel();
+    if (controller.value.isPlaying) {
+      _hideTimer = Timer(const Duration(seconds: 3), () {
+        if (mounted) setState(() => _showControls = false);
+      });
+    }
+  }
+
+  Future<void> _playVideo() async {
+    if (_videoController != null) {
+      if (_videoController!.value.isPlaying) {
+        await _videoController!.pause();
+      } else {
+        await _videoController!.play();
+      }
+      if (mounted) setState(() {});
+      return;
+    }
+
+    setState(() {
+      _loadingVideo = true;
+    });
+    try {
+      final controller = VideoPlayerController.asset('assets/videos/home_video.mp4');
+      await controller.initialize();
+      await controller.play();
+      if (!mounted) {
+        await controller.dispose();
+        return;
+      }
+      setState(() {
+        _videoController = controller;
+        _showControls = false;
+      });
+    } catch (_) {
+    } finally {
+      if (mounted) setState(() => _loadingVideo = false);
+    }
   }
 
   Future<void> _refresh() async {
@@ -257,6 +345,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 34),
                         FadeSlideIn(
                           delay: const Duration(milliseconds: 210),
+                          child: _homeVideoHero(),
+                        ),
+                        const SizedBox(height: 34),
+                        FadeSlideIn(
+                          delay: const Duration(milliseconds: 270),
+                          child: _adBlock(),
+                        ),
+                        const SizedBox(height: 34),
+                        FadeSlideIn(
+                          delay: const Duration(milliseconds: 330),
                           child: _reviews(),
                         ),
                       ],
@@ -582,6 +680,293 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _homeVideoHero() {
+    final controller = _videoController;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        AspectRatio(
+          aspectRatio: controller?.value.isInitialized == true
+              ? controller!.value.aspectRatio
+              : 9 / 16,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                ColoredBox(color: AppColors.surface(context)),
+                if (controller?.value.isInitialized == true)
+                  GestureDetector(
+                    onTap: _toggleControls,
+                    child: VideoPlayer(controller!),
+                  )
+                else
+                  Image.asset(
+                    'assets/images/home_video_thumbnail.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              AppColors.neonBlue.withValues(alpha: .25),
+                              AppColors.violet.withValues(alpha: .20),
+                              AppColors.themeGold(context).withValues(alpha: .12),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Home Video',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppColors.text(context),
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                if (controller?.value.isInitialized == true)
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      ignoring: !_showControls,
+                      child: AnimatedOpacity(
+                        opacity: _showControls ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 300),
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: .4),
+                          ),
+                          child: Stack(
+                            children: [
+                              Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IconButton(
+                                      iconSize: 42,
+                                      color: AppColors.themeGold(context),
+                                      icon: const Icon(Icons.replay_10),
+                                      onPressed: () => _seekBy(-10),
+                                    ),
+                                    const SizedBox(width: 24),
+                                    InkWell(
+                                      onTap: _togglePlay,
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 220),
+                                        width: 74,
+                                        height: 74,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.themeGold(context).withValues(alpha: .92),
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppColors.themeGold(context).withValues(alpha: .35),
+                                              blurRadius: 28,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Icon(
+                                          controller!.value.isPlaying
+                                              ? Icons.pause
+                                              : Icons.play_arrow,
+                                          color: AppColors.primaryBg,
+                                          size: 42,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 24),
+                                    IconButton(
+                                      iconSize: 42,
+                                      color: AppColors.themeGold(context),
+                                      icon: const Icon(Icons.forward_10),
+                                      onPressed: () => _seekBy(10),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Positioned(
+                                left: 16,
+                                right: 16,
+                                bottom: 12,
+                                child: ValueListenableBuilder<VideoPlayerValue>(
+                                  valueListenable: controller,
+                                  builder: (context, value, child) {
+                                    return Row(
+                                      children: [
+                                        Text(
+                                          _formatDuration(value.position),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: VideoProgressIndicator(
+                                            controller,
+                                            allowScrubbing: true,
+                                            colors: VideoProgressColors(
+                                              playedColor: AppColors.themeGold(context),
+                                              bufferedColor: Colors.white24,
+                                              backgroundColor: Colors.white12,
+                                            ),
+                                            padding: const EdgeInsets.symmetric(vertical: 12),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          _formatDuration(value.duration),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                else if (_loadingVideo)
+                  Positioned.fill(
+                    child: Center(
+                      child: CircularProgressIndicator(color: AppColors.themeGold(context)),
+                    ),
+                  )
+                else
+                  Positioned.fill(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: _playVideo,
+                        child: Center(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 220),
+                            width: 74,
+                            height: 74,
+                            decoration: BoxDecoration(
+                              color: AppColors.themeGold(context).withValues(alpha: .92),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.themeGold(context).withValues(alpha: .35),
+                                  blurRadius: 28,
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.play_arrow,
+                              color: AppColors.primaryBg,
+                              size: 42,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _adBlock() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          'OPEN YOUR ACCOUNT FOR FREE',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AppColors.text(context),
+            fontSize: 22,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.2,
+          ),
+        ),
+        const SizedBox(height: 16),
+        GestureDetector(
+          onTap: () => _launch('https://www.zerofx.club/?ref=Vicky'),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0D1117), // Assuming dark background for logo
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.themeGold(context).withValues(alpha: 0.3)),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.neonBlue.withValues(alpha: 0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                )
+              ],
+            ),
+            child: Column(
+              children: [
+                // Display the logo
+                Image.asset(
+                  'assets/images/zerofx_logo.png', // Fallback to custom text if the image file isn't found
+                  height: 60,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Text(
+                      'Zerofx.club',
+                      style: TextStyle(
+                        color: Color(0xFF00D2B4), // Teal color from the image
+                        fontSize: 38,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 24),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: AppColors.themeGold(context),
+                    borderRadius: BorderRadius.circular(99),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.themeGold(context).withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    'DOWNLOAD NOW',
+                    style: TextStyle(
+                      color: AppColors.primaryBg,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                      letterSpacing: 1.1,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
