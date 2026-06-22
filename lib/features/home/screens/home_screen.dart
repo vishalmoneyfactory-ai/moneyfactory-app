@@ -753,7 +753,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     IconButton(
                                       iconSize: 42,
-                                      color: AppColors.themeGold(context),
+                                      color: AppColors.themeButtonColor(context),
                                       icon: const Icon(Icons.replay_10),
                                       onPressed: () => _seekBy(-10),
                                     ),
@@ -765,11 +765,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                         width: 74,
                                         height: 74,
                                         decoration: BoxDecoration(
-                                          color: AppColors.themeGold(context).withValues(alpha: .92),
+                                          color: AppColors.themeButtonColor(context).withValues(alpha: .92),
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
-                                              color: AppColors.themeGold(context).withValues(alpha: .35),
+                                              color: AppColors.themeButtonColor(context).withValues(alpha: .35),
                                               blurRadius: 28,
                                             ),
                                           ],
@@ -778,7 +778,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           controller!.value.isPlaying
                                               ? Icons.pause
                                               : Icons.play_arrow,
-                                          color: AppColors.primaryBg,
+                                          color: AppColors.themeButtonText(context),
                                           size: 42,
                                         ),
                                       ),
@@ -786,7 +786,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     const SizedBox(width: 24),
                                     IconButton(
                                       iconSize: 42,
-                                      color: AppColors.themeGold(context),
+                                      color: AppColors.themeButtonColor(context),
                                       icon: const Icon(Icons.forward_10),
                                       onPressed: () => _seekBy(10),
                                     ),
@@ -816,7 +816,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             controller,
                                             allowScrubbing: true,
                                             colors: VideoProgressColors(
-                                              playedColor: AppColors.themeGold(context),
+                                              playedColor: AppColors.themeButtonColor(context),
                                               bufferedColor: Colors.white24,
                                               backgroundColor: Colors.white12,
                                             ),
@@ -846,7 +846,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 else if (_loadingVideo)
                   Positioned.fill(
                     child: Center(
-                      child: CircularProgressIndicator(color: AppColors.themeGold(context)),
+                      child: CircularProgressIndicator(color: AppColors.themeButtonColor(context)),
                     ),
                   )
                 else
@@ -861,18 +861,18 @@ class _HomeScreenState extends State<HomeScreen> {
                             width: 74,
                             height: 74,
                             decoration: BoxDecoration(
-                              color: AppColors.themeGold(context).withValues(alpha: .92),
+                              color: AppColors.themeButtonColor(context).withValues(alpha: .92),
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.themeGold(context).withValues(alpha: .35),
+                                  color: AppColors.themeButtonColor(context).withValues(alpha: .35),
                                   blurRadius: 28,
                                 ),
                               ],
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.play_arrow,
-                              color: AppColors.primaryBg,
+                              color: AppColors.themeButtonText(context),
                               size: 42,
                             ),
                           ),
@@ -942,11 +942,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
                   decoration: BoxDecoration(
-                    color: AppColors.themeGold(context),
+                    color: AppColors.themeButtonColor(context),
                     borderRadius: BorderRadius.circular(99),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.themeGold(context).withValues(alpha: 0.3),
+                        color: AppColors.themeButtonColor(context).withValues(alpha: 0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -955,7 +955,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Text(
                     'SIGN UP FOR FREE',
                     style: TextStyle(
-                      color: AppColors.primaryBg,
+                      color: AppColors.themeButtonText(context),
                       fontWeight: FontWeight.w900,
                       fontSize: 16,
                       letterSpacing: 1.1,
