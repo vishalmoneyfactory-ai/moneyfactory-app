@@ -498,6 +498,10 @@ Earn with Money Factory.
         'Earn the reward',
         'Get Rs 300 on course sales and Rs 1000 on bundle sales.',
       ),
+      _step(
+        'Get Instant Cashback',
+        'Receive your earnings instantly in your wallet after every successful referral.',
+      ),
       const SizedBox(height: 14),
       Text(
         'Earn rewards on each qualifying sale.',

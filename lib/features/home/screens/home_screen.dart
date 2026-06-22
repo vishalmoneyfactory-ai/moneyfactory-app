@@ -481,7 +481,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _description() => _section(
     children: [
-      _sectionKicker('Indicator System'),
+      _sectionKicker('Entry Setup'),
       Text(
         'The Money Factory indicator',
         style: TextStyle(
