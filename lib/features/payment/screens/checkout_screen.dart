@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfdropcheckoutpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpaymentgateway/cfpaymentgatewayservice.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfsession/cfsession.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cftheme/cftheme.dart';
+import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
 import 'package:go_router/go_router.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
-
+import 'package:dio/dio.dart';
 import '../../../core/api/api_service.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/gold_button.dart';
+import '../../../core/utils/formatters.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({
@@ -23,26 +26,22 @@ class CheckoutScreen extends StatefulWidget {
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  late final Razorpay _razorpay;
+  final CFPaymentGatewayService _cfPaymentGatewayService = CFPaymentGatewayService();
   final _coupon = TextEditingController();
   final _referral = TextEditingController();
   Map<String, dynamic>? _course;
-  Map<String, dynamic>? _order;
   num _discount = 0;
   bool _loading = false;
 
   @override
   void initState() {
     super.initState();
-    _razorpay = Razorpay();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _success);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _error);
+    _cfPaymentGatewayService.setCallback(_verifyPayment, _onError);
     _load();
   }
 
   @override
   void dispose() {
-    _razorpay.clear();
     _coupon.dispose();
     _referral.dispose();
     super.dispose();
@@ -76,23 +75,32 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'courseId': widget.courseId,
         'isBundle': widget.isBundle,
         'couponCode': _coupon.text.trim().isEmpty ? null : _coupon.text.trim(),
-        'referralCode': _referral.text.trim().isEmpty
-            ? null
-            : _referral.text.trim(),
+        'referralCode': _referral.text.trim().isEmpty ? null : _referral.text.trim(),
       });
-      _order = order;
-      _razorpay.open({
-        'key': order['keyId'].toString().isNotEmpty
-            ? order['keyId']
-            : api.razorpayKey(),
-        'amount': order['amount'] * 100,
-        'currency': 'INR',
-        'name': 'Money Factory',
-        'description': _course?['title'] ?? 'Course Purchase',
-        'order_id': order['orderId'],
-        'prefill': const {'contact': '', 'email': ''},
-        'theme': {'color': '#FFD700'},
-      });
+
+      final environment = order['environment'] == 'PRODUCTION' ? CFEnvironment.PRODUCTION : CFEnvironment.SANDBOX;
+
+      var session = CFSessionBuilder()
+          .setEnvironment(environment)
+          .setOrderId(order['orderId'])
+          .setPaymentSessionId(order['paymentSessionId'])
+          .build();
+
+      var theme = CFThemeBuilder()
+          .setNavigationBarBackgroundColorColor("#FFD700")
+          .setNavigationBarTextColor("#000000")
+          .setButtonBackgroundColor("#FFD700")
+          .setButtonTextColor("#000000")
+          .setPrimaryTextColor("#FFFFFF")
+          .build();
+
+      var dropCheckoutPayment = CFDropCheckoutPaymentBuilder()
+          .setSession(session)
+          .setTheme(theme)
+          .build();
+
+      _cfPaymentGatewayService.doPayment(dropCheckoutPayment);
+
     } catch (e) {
       if (e is DioException &&
           e.response?.data is Map &&
@@ -110,27 +118,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
-  Future<void> _success(PaymentSuccessResponse response) async {
-    await api.verifyPayment({
-      'razorpayOrderId': response.orderId ?? _order?['orderId'],
-      'razorpayPaymentId': response.paymentId,
-      'razorpaySignature': response.signature,
-    });
-    if (!mounted) return;
-    _snack('Payment successful', AppColors.success);
-    context.go('/learning');
+  void _verifyPayment(String orderId) async {
+    try {
+      await api.verifyPayment({
+        'orderId': orderId,
+      });
+      if (!mounted) return;
+      _snack('Payment successful', AppColors.success);
+      context.go('/learning');
+    } catch (e) {
+      _snack('Payment verification failed on server', AppColors.error);
+    }
   }
 
-  void _error(PaymentFailureResponse response) =>
-      _snack(response.message ?? 'Payment failed', AppColors.error);
-  void _snack(String text, Color color) => ScaffoldMessenger.of(
-    context,
-  ).showSnackBar(SnackBar(content: Text(text), backgroundColor: color));
+  void _onError(dynamic error, String orderId) {
+    _snack(error.getMessage() ?? 'Payment failed', AppColors.error);
+  }
+
+  void _snack(String text, Color color) => ScaffoldMessenger.of(context)
+      .showSnackBar(SnackBar(content: Text(text), backgroundColor: color));
 
   @override
   Widget build(BuildContext context) {
-    final originalPrice =
-        (_course?['originalPrice'] ?? _course?['price'] ?? 0) as num;
+    final originalPrice = (_course?['originalPrice'] ?? _course?['price'] ?? 0) as num;
     final price = (_course?['effectivePrice'] ?? _course?['price'] ?? 0) as num;
     final total = (price - _discount).clamp(0, price);
     return Scaffold(
@@ -218,14 +228,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     const SizedBox(height: 8),
                     GoldButton(
                       label: 'Upgrade to Bundle',
-                      onPressed: () =>
-                          context.push('/checkout/bundle?bundle=true'),
+                      onPressed: () => context.push('/checkout/bundle?bundle=true'),
                     ),
                   ]),
                 ],
                 const SizedBox(height: 20),
                 GoldButton(
-                  label: _loading ? 'Preparing...' : 'Pay with Razorpay',
+                  label: _loading ? 'Preparing...' : 'Pay with Cashfree',
                   onPressed: _loading ? null : _pay,
                 ),
               ],
@@ -259,8 +268,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         Text(
           value,
           style: TextStyle(
-            color:
-                color ??
+            color: color ??
                 (mutedStrike
                     ? AppColors.mutedText(context)
                     : AppColors.text(context)),
