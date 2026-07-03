@@ -409,6 +409,18 @@ $link
                             ],
                           ),
                         ),
+                        const SizedBox(height: 36),
+                        const Center(
+                          child: Text(
+                            'Developed By Brevitus Technology',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
