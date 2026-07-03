@@ -187,11 +187,24 @@ $link
                               ),
                             ),
                             const SizedBox(height: 20),
-                            Text(
-                              'Pull down to retry',
-                              style: TextStyle(
-                                color: AppColors.themeGold(context),
-                                fontSize: 13,
+                            TextButton.icon(
+                              onPressed: _refresh,
+                              icon: const Icon(Icons.refresh, size: 20),
+                              label: const Text('Try Again'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: AppColors.themeGold(context),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            TextButton.icon(
+                              onPressed: () async {
+                                await _auth.signOut();
+                                if (context.mounted) context.go('/login');
+                              },
+                              icon: const Icon(Icons.logout, size: 20),
+                              label: const Text('Force Sign Out'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: AppColors.error,
                               ),
                             ),
                           ],
