@@ -58,6 +58,8 @@ class ApiService {
   Future<Map<String, dynamic>> removeProfileImage() async =>
       (await _client.dio.delete('/auth/me/profile-image')).data['user']
           as Map<String, dynamic>;
+  Future<void> deleteAccount() async =>
+      await _client.dio.delete('/auth/me');
   Future<Map<String, dynamic>> validateCoupon(
     Map<String, dynamic> body,
   ) async =>

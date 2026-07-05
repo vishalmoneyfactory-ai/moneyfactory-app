@@ -346,6 +346,13 @@ $link
                               ),
                               _tile(
                                 context,
+                                'Delete Account',
+                                'Permanently delete your account',
+                                Icons.person_remove,
+                                () => _showDeleteAccountWarning(context),
+                              ),
+                              _tile(
+                                context,
                                 'Help & Support',
                                 'Contact us for any issues',
                                 Icons.support_agent,
@@ -1349,6 +1356,52 @@ $link
       .take(2)
       .map((p) => p.isEmpty ? '' : p[0].toUpperCase())
       .join();
+
+  void _showDeleteAccountWarning(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'Delete Account?',
+          style: TextStyle(
+            color: AppColors.error,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        content: const Text(
+          'Are you sure you want to permanently delete your account? All your purchased courses, progress, and certificates will be lost. This action cannot be undone.',
+          style: TextStyle(color: Colors.white70, height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await _run(
+                () async {
+                  await api.deleteAccount();
+                  await _auth.signOut();
+                  if (context.mounted) context.go('/login');
+                },
+                success: 'Account deleted permanently',
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('Delete', style: TextStyle(fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _showText(BuildContext context, String title, String body) =>
     showModalBottomSheet(
